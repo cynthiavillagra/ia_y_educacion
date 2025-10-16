@@ -1,0 +1,200 @@
+[
+    {
+        "file":  "pdfs/ChatGPT_y_educacion_universitaria_ribera_-_montesdeoca.pdf",
+        "title":  "ChatGPT y educación universitaria: posibilidades y límites de ChatGPT como herramienta docente",
+        "author":  "Ribera, M.; Díaz Montesdeoca, O. (Coords.)",
+        "year":  2024,
+        "publisher":  "Ediciones Octaedro / IDP/ICE, Universidad de Barcelona",
+        "url":  "https://octaedro.com/wp-content/uploads/2024/09/9788410054011.pdf",
+        "original_url":  "https://octaedro.com/libro/chatgpt-y-educacion-universitaria/",
+        "license": "Uso académico no comercial",
+        "description": "Compilación académica que explora el uso de ChatGPT en la educación superior desde perspectivas pedagógicas, técnicas y éticas."
+    },
+    {
+        "file": "pdfs/Didactica_y_tecnologia_-_kap-2024.pdf",
+        "title": "Didáctica y tecnología: enseñanza con sentido en la era digital",
+        "author": "Kapelusz Educativa",
+        "year": 2024,
+        "publisher": "Editorial Kapelusz",
+        "url": "https://www.kapelusz.com.ar/libros/didactica-y-tecnologia",
+        "original_url": "https://www.editorialkapelusz.com"
+    },
+    {
+        "file": "pdfs/Docencia_en_la_era_de_la_IA.pdf",
+        "title": "Docencia en la era de la inteligencia artificial",
+        "author": "Ministerio de Educación de la Nación Argentina",
+        "year": 2024,
+        "publisher": "Argentina.gob.ar – Secretaría de Innovación Educativa",
+        "url": "https://www.argentina.gob.ar/educacion/paideia/docencia-en-la-era-de-la-ia",
+        "original_url": "https://www.argentina.gob.ar/educacion/paideia"
+    },
+    {
+        "file": "pdfs/Emily_Bender-2024-preprint.pdf",
+        "title": "AI and the Future of Linguistics",
+        "author": "Emily M. Bender",
+        "year": 2024,
+        "publisher": "University of Washington – Department of Linguistics",
+        "url": "https://linguistics.washington.edu/research/publications/ai-and-future-linguistics",
+        "original_url": "https://linguistics.washington.edu"
+    },
+    {
+        "file": "pdfs/Guia-rapida-alumnos-inteligencia-artificial.pdf",
+        "title": "Guía rápida para estudiantes sobre inteligencia artificial",
+        "author": "Ministerio de Capital Humano – Secretaría de Educación",
+        "year": 2025,
+        "publisher": "Argentina.gob.ar – Programa Paideia",
+        "url": "https://www.argentina.gob.ar/educacion/paideia/guia-rapida-inteligencia-artificial",
+        "original_url": "https://www.argentina.gob.ar/educacion/paideia"
+    },
+    {
+        "file":  "pdfs/Guia_estudios.pdf",
+        "title":  "Guía para estudiantes sobre cómo desenvolverse en la universidad en la era de la inteligencia artificial",
+        "author":  "Universidad de Ciencias Empresariales y Sociales (UCES)",
+        "year":  2024,
+        "publisher":  "UCES",
+        "url":  "http://www.studentguidetoAI.org",
+        "original_url":  "https://www.uces.edu.ar/",
+        "license": "Uso educativo sin fines comerciales",
+        "description": "Guía dirigida a estudiantes universitarios para comprender y utilizar responsablemente herramientas de inteligencia artificial en su formación."
+    },
+    {
+        "file":  "pdfs/IA_en_la_escuela_-_Guia_para_un_uso_critico.pdf",
+        "title":  "IA en la escuela: Guía para un uso crítico",
+        "author":  "Ministerio de Capital Humano. Secretaría de Educación de la Ciudad Autónoma de Buenos Aires",
+        "year":  2024,
+        "publisher":  "Gerencia Operativa de Educación Digital – Ministerio de Educación CABA",
+        "url":  "https://www.buenosaires.gob.ar/educacion/ia-en-la-escuela",
+        "original_url":  "https://www.buenosaires.gob.ar/educacion/ia-en-la-escuela",
+        "license": "Dominio público",
+        "description": "Guía pedagógica elaborada por el Gobierno de la Ciudad de Buenos Aires para orientar el uso crítico, ético y responsable de la inteligencia artificial en las escuelas."
+    },
+    {
+        "file":  "pdfs/Metodologias_activas_IA.pdf",
+        "title":  "Innovación educativa con metodologías activas en tiempos de IA",
+        "author":  "Videla, Franco",
+        "year":  2024,
+        "publisher":  "Publicación independiente",
+        "url":  "https://www.linkedin.com/in/franco-videla-/",
+        "original_url":  "https://www.linkedin.com/in/franco-videla-/",
+        "license": "Uso educativo sin fines comerciales",
+        "description": "Documento que aborda la integración de metodologías activas (ABP, aula invertida, simulación) con inteligencia artificial en contextos educativos."
+    },
+    {
+        "file":  "pdfs/Nuevas_Tecnologias_de_la_Informacion_-_secundaria.pdf",
+        "title":  "Nuevas Tecnologías de la Información y la Conectividad. Diseño Curricular para la Educación Secundaria Ciclo Superior",
+        "author":  "Dirección General de Cultura y Educación de la Provincia de Buenos Aires",
+        "year":  2010,
+        "publisher":  "Gobierno de la Provincia de Buenos Aires",
+        "url":  "https://abc.gob.ar/secretarias/sites/default/files/2021-03/nticx.pdf",
+        "original_url":  "https://abc.gob.ar/secretarias/sites/default/files/2021-03/nticx.pdf",
+        "license": "Uso público educativo",
+        "description": "Documento curricular oficial de la Provincia de Buenos Aires que establece lineamientos para la enseñanza de tecnologías de la información."
+    },
+    {
+        "file":  "pdfs/Proyectos_practicos_de_IA_para_el_aula.pdf",
+        "title":  "Proyectos prácticos de IA para el aula: Una guía para maestros de materias optativas",
+        "author":  "ISTE – International Society for Technology in Education",
+        "year":  2023,
+        "publisher":  "ISTE & General Motors",
+        "url":  "https://app.box.com/s/64z2p1tyxwidt881a3e34c7g0qpliszd",
+        "original_url":  "https://www.iste.org/",
+        "license": "CC BY 4.0",
+        "description": "Guía con proyectos aplicables de inteligencia artificial para el aula, desarrollada por ISTE con ejemplos y estándares AI4K12."
+    },
+    {
+        "file": "pdfs/Sobre_loros_estocasticos_Una_mirada_a_los_modelos.pdf",
+        "title": "Sobre loros estocásticos: Una mirada a los modelos de lenguaje de gran escala",
+        "author": "Emily M. Bender, Timnit Gebru, Angelina McMillan-Major, Shmargaret Shmitchell",
+        "year": 2021,
+        "publisher": "ACM Conference on Fairness, Accountability, and Transparency (FAccT)",
+        "url": "https://dl.acm.org/doi/10.1145/3442188.3445922",
+        "original_url": "https://faculty.washington.edu/ebender/papers.html"
+    },
+    {
+        "file": "pdfs/Unesco_-_marco_de_competencia_para_estudiantes_en_materia_de_ia.pdf",
+        "title": "Marco de competencias para estudiantes en materia de inteligencia artificial",
+        "author": "UNESCO",
+        "year": 2023,
+        "publisher": "Organización de las Naciones Unidas para la Educación, la Ciencia y la Cultura (UNESCO)",
+        "url": "https://unesdoc.unesco.org/ark:/48223/pf0000386015_spa",
+        "original_url": "https://unesdoc.unesco.org"
+    },
+    {
+        "file":  "pdfs/documento_guia_de_integracion_vf_digital.pdf",
+        "title":  "Guía para la integración de las inteligencias artificiales en educación",
+        "author":  "Ministerio de Capital Humano. Secretaría de Educación",
+        "year":  2025,
+        "publisher":  "Argentina.gob.ar",
+        "url":  "https://www.argentina.gob.ar/sites/default/files/documento_guia_de_integracion_vf_digital.pdf",
+        "original_url":  "https://www.argentina.gob.ar/educacion/paideia",
+        "license": "Dominio público",
+        "description": "Documento orientador para la incorporación ética y pedagógica de herramientas de IA en escuelas argentinas."
+    },
+    {
+        "file": "pdfs/emily_bender_-_loros_estocasticos.pdf",
+        "title": "On the Dangers of Stochastic Parrots: Can Language Models Be Too Big?",
+        "author": "Emily M. Bender, Timnit Gebru, Angelina McMillan-Major, Shmargaret Shmitchell",
+        "year": 2021,
+        "publisher": "ACM FAccT Conference",
+        "url": "https://dl.acm.org/doi/10.1145/3442188.3445922",
+        "original_url": "https://faculty.washington.edu/ebender/papers.html"
+    },
+    {
+        "file":  "pdfs/guia_para_el_uso_de_la_ia_generativa_en-educacion_unesco.pdf",
+        "title":  "Guía para el uso de IA generativa en educación e investigación",
+        "author":  "UNESCO",
+        "year":  2024,
+        "publisher":  "Organización de las Naciones Unidas para la Educación, la Ciencia y la Cultura",
+        "url":  "https://unesdoc.unesco.org/ark:/48223/pf0000386693_spa",
+        "original_url":  "https://unesdoc.unesco.org/ark:/48223/pf0000386693_spa",
+        "license": "CC BY-SA 4.0",
+        "description": "Guía internacional sobre el uso ético y pedagógico de la inteligencia artificial generativa en educación e investigación."
+    },
+    {
+        "file":  "pdfs/guia_para_el_uso_de_la_inteligencia_artificial_ia_uces.pdf",
+        "title":  "Guía para el uso de la inteligencia artificial en educación",
+        "author":  "Universidad de Ciencias Empresariales y Sociales (UCES)",
+        "year":  2024,
+        "publisher":  "UCES",
+        "url":  "http://www.studentguidetoAI.org",
+        "original_url":  "https://www.uces.edu.ar/",
+        "license": "Uso educativo sin fines comerciales",
+        "description": "Guía dirigida a estudiantes universitarios para comprender y utilizar responsablemente herramientas de inteligencia artificial en su formación."
+    },
+    {
+        "file": "pdfs/la-Guia-sobre-Inteligencia-Artificial-para-estudiantes-2025.pdf",
+        "title": "La guía sobre inteligencia artificial para estudiantes",
+        "author": "Ministerio de Capital Humano – Secretaría de Educación",
+        "year": 2025,
+        "publisher": "Argentina.gob.ar – Programa Paideia",
+        "url": "https://www.argentina.gob.ar/educacion/paideia/guia-inteligencia-artificial-estudiantes",
+        "original_url": "https://www.argentina.gob.ar/educacion/paideia"
+    },
+    {
+        "file": "pdfs/la-ia-y-el-futuro-de-la-educacion.pdf",
+        "title": "La IA y el futuro de la educación: Disrupciones, dilemas y direcciones",
+        "author": "Isaacs, S. (Ed.)",
+        "year": 2025,
+        "publisher": "UNESCO",
+        "url": "https://doi.org/10.54675/KECK1261",
+        "original_url": "https://unesdoc.unesco.org/ark:/48223/pf0000394527_spa"
+    },
+    {
+        "file": "pdfs/unesco_-_Guidance_for_generative_AI_in_education_and_research.pdf",
+        "title": "Guidance for generative AI in education and research",
+        "author": "UNESCO",
+        "year": 2023,
+        "publisher": "UNESCO",
+        "url": "https://unesdoc.unesco.org/ark:/48223/pf0000386693_eng",
+        "original_url": "https://unesdoc.unesco.org"
+    },
+    {
+        "file": "pdfs/unesco_-_ai_and_the_future_of_education_eng.pdf",
+        "title": "AI and the Future of Education: Disruptions, Dilemmas and Directions",
+        "author": "Isaacs, S. (Ed.)",
+        "year": 2025,
+        "publisher": "UNESCO",
+        "url": "https://doi.org/10.54675/KECK1261",
+        "original_url": "https://unesdoc.unesco.org/ark:/48223/pf0000394527_eng"
+    }
+]
