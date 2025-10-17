@@ -8,7 +8,6 @@ export default async function handler(req, res) {
   try {
     const { title, author, year, type, license, sourceUrl, fileData, fileName } = req.body;
 
-    // Autenticación con Google API (usando una cuenta de servicio)
     const auth = new google.auth.GoogleAuth({
       credentials: {
         type: "service_account",
@@ -24,7 +23,6 @@ export default async function handler(req, res) {
     const drive = google.drive({ version: 'v3', auth });
     const buffer = Buffer.from(fileData.split(',')[1], 'base64');
 
-    // Crear archivo en la carpeta de Drive
     const file = await drive.files.create({
       requestBody: {
         name: fileName,
@@ -34,14 +32,13 @@ export default async function handler(req, res) {
         mimeType: 'application/pdf',
         body: Buffer.from(buffer),
       },
-      fields: 'id, webViewLink, webContentLink',
+      fields: 'id, webViewLink',
     });
 
-    console.log(`Archivo subido: ${file.data.webViewLink}`);
-
-    return res.status(200).json({ message: 'OK', file: file.data });
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({ message: error.message });
+    res.status(200).json({ message: 'OK', link: file.data.webViewLink });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: err.message });
   }
 }
+

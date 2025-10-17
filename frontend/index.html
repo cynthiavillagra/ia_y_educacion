@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Carga de documentos SAIA</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 2rem auto;
+      max-width: 600px;
+      line-height: 1.5;
+    }
+    h2 {
+      color: #333;
+      text-align: center;
+    }
+    label {
+      font-weight: bold;
+      margin-top: 1rem;
+      display: block;
+    }
+    input, select, textarea {
+      width: 100%;
+      padding: 0.5rem;
+      margin-top: 0.3rem;
+      box-sizing: border-box;
+    }
+    button {
+      background-color: #2c5cc5;
+      color: white;
+      border: none;
+      padding: 0.6rem 1.2rem;
+      cursor: pointer;
+      border-radius: 4px;
+      font-size: 1rem;
+      margin-top: 1rem;
+    }
+    button:hover {
+      background-color: #1e4aa5;
+    }
+    #status {
+      margin-top: 1rem;
+      font-weight: bold;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <h2>Subir nuevo documento</h2>
+
+  <form id="uploadForm">
+    <label for="title">Título</label>
+    <input type="text" name="title" id="title" required>
+
+    <label for="author">Autor/es</label>
+    <input type="text" name="author" id="author">
+
+    <label for="year">Año</label>
+    <input type="number" name="year" id="year" min="1900" max="2100">
+
+    <label for="type">Tipo</label>
+    <input type="text" name="type" id="type">
+
+    <label for="license">Licencia</label>
+    <input type="text" name="license" id="license">
+
+    <label for="sourceUrl">Fuente original (URL)</label>
+    <input type="url" name="sourceUrl" id="sourceUrl">
+
+    <label for="fileInput">Archivo PDF</label>
+    <input type="file" id="fileInput" accept="application/pdf" required>
+
+    <button type="submit">Enviar</button>
+  </form>
+
+  <p id="status"></p>
+
+  <script>
+    document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const form = e.target;
+      const file = document.getElementById('fileInput').files[0];
+      const reader = new FileReader();
+
+      reader.onloadend = async () => {
+        const body = {
+          title: form.title.value,
+          author: form.author.value,
+          year: form.year.value,
+          type: form.type.value,
+          license: form.license.value,
+          sourceUrl: form.sourceUrl.value,
+          fileName: file.name,
+          fileData: reader.result
+        };
+
+        document.getElementById('status').textContent = "Subiendo archivo...";
+
+        try {
+          const res = await fetch('https://ia-y-educacion.vercel.app/api/upload', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+          });
+
+          const result = await res.json();
+
+          if (res.ok) {
+            document.getElementById('status').textContent =
+              "✅ Archivo subido correctamente. Ver en Drive: " + result.link;
+          } else {
+            document.getElementById('status').textContent =
+              "⚠️ Error: " + (result.message || "No se pudo subir el archivo.");
+          }
+        } catch (err) {
+          document.getElementById('status').textContent =
+            "❌ Error de conexión: " + err.message;
+        }
+      };
+
+      reader.readAsDataURL(file);
+    });
+  </script>
+</body>
+</html>
