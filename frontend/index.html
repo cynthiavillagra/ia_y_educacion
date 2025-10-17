@@ -9,9 +9,10 @@
       margin: 2rem auto;
       max-width: 600px;
       line-height: 1.5;
+      background-color: #f8f9fa;
     }
     h2 {
-      color: #333;
+      color: #2c5cc5;
       text-align: center;
     }
     label {
@@ -24,6 +25,8 @@
       padding: 0.5rem;
       margin-top: 0.3rem;
       box-sizing: border-box;
+      border: 1px solid #ccc;
+      border-radius: 4px;
     }
     button {
       background-color: #2c5cc5;
@@ -34,15 +37,21 @@
       border-radius: 4px;
       font-size: 1rem;
       margin-top: 1rem;
+      display: block;
+      width: 100%;
     }
     button:hover {
       background-color: #1e4aa5;
     }
     #status {
-      margin-top: 1rem;
+      margin-top: 1.2rem;
       font-weight: bold;
       text-align: center;
+      padding: 0.8rem;
+      border-radius: 4px;
     }
+    #status.ok { color: #155724; background-color: #d4edda; }
+    #status.error { color: #721c24; background-color: #f8d7da; }
   </style>
 </head>
 <body>
@@ -73,48 +82,62 @@
     <button type="submit">Enviar</button>
   </form>
 
-  <p id="status"></p>
+  <div id="status"></div>
 
   <script>
+    const API_URL = "https://ia-y-educacion.vercel.app/api/upload";
+
     document.getElementById('uploadForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const form = e.target;
       const file = document.getElementById('fileInput').files[0];
+      const status = document.getElementById('status');
+
+      if (!file) {
+        status.textContent = "⚠️ Por favor seleccioná un archivo PDF.";
+        status.className = "error";
+        return;
+      }
+
       const reader = new FileReader();
 
       reader.onloadend = async () => {
         const body = {
-          title: form.title.value,
-          author: form.author.value,
+          title: form.title.value.trim(),
+          author: form.author.value.trim(),
           year: form.year.value,
-          type: form.type.value,
-          license: form.license.value,
-          sourceUrl: form.sourceUrl.value,
+          type: form.type.value.trim(),
+          license: form.license.value.trim(),
+          sourceUrl: form.sourceUrl.value.trim(),
           fileName: file.name,
           fileData: reader.result
         };
 
-        document.getElementById('status').textContent = "Subiendo archivo...";
+        status.textContent = "⏳ Subiendo archivo...";
+        status.className = "";
 
         try {
-          const res = await fetch('https://ia-y-educacion.vercel.app/api/upload', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(body)
+          const res = await fetch(API_URL, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify(body),
+            mode: "cors"
           });
 
-          const result = await res.json();
+          const result = await res.json().catch(() => ({}));
 
           if (res.ok) {
-            document.getElementById('status').textContent =
-              "✅ Archivo subido correctamente. Ver en Drive: " + result.link;
+            status.textContent = "✅ Archivo subido correctamente. Ver en Drive: " + result.link;
+            status.className = "ok";
           } else {
-            document.getElementById('status').textContent =
-              "⚠️ Error: " + (result.message || "No se pudo subir el archivo.");
+            status.textContent = "⚠️ Error: " + (result.message || "No se pudo subir el archivo.");
+            status.className = "error";
           }
         } catch (err) {
-          document.getElementById('status').textContent =
-            "❌ Error de conexión: " + err.message;
+          status.textContent = "❌ Error de conexión: " + err.message;
+          status.className = "error";
         }
       };
 
