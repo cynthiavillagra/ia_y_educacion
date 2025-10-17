@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Carga de documentos SAIA</title>
+  <style>
+    body { font-family: sans-serif; margin: 2rem; max-width: 600px; }
+    input, select, textarea { width: 100%; margin-bottom: 1rem; }
+    button { padding: 0.5rem 1rem; }
+  </style>
+</head>
+<body>
+  <h2>Subir nuevo documento</h2>
+  <form id="uploadForm">
+    <label>Título</label><input type="text" name="title" required>
+    <label>Autor/es</label><input type="text" name="author">
+    <label>Año</label><input type="number" name="year" min="1900" max="2100">
+    <label>Tipo</label><input type="text" name="type">
+    <label>Licencia</label><input type="text" name="license">
+    <label>Fuente original (URL)</label><input type="url" name="sourceUrl">
+    <label>Archivo PDF</label><input type="file" id="fileInput" accept="application/pdf" required>
+    <button type="submit">Enviar</button>
+  </form>
+  
+  <p id="status"></p>
+
+  <script>
+    document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const form = e.target;
+      const file = document.getElementById('fileInput').files[0];
+      const reader = new FileReader();
+      reader.onloadend = async () => {
+        const data = new URLSearchParams();
+        data.append('fileName', file.name);
+        data.append('fileData', reader.result);
+        data.append('title', form.title.value);
+        data.append('author', form.author.value);
+        data.append('year', form.year.value);
+        data.append('type', form.type.value);
+        data.append('license', form.license.value);
+        data.append('sourceUrl', form.sourceUrl.value);
+
+        const response = await fetch('TU_URL_DEL_SCRIPT', { method: 'POST', body: data });
+        document.getElementById('status').textContent = await response.text();
+      };
+      reader.readAsDataURL(file);
+    });
+  </script>
+</body>
+</html>
