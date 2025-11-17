@@ -1,5 +1,5 @@
 from typing import List, Optional, Tuple
-from .db_connector import get_connection
+from utils.db_connector import get_connection
 
 
 def get_coleccion_id(nombre: str) -> Optional[str]:
