@@ -62,7 +62,7 @@ function cardTemplate(item) {
   const autores = (item.autores||[]).join('; ')
   const resumen = (item.resumen||'').slice(0, 160)
   return `
-    <a class="card hover:shadow-sm transition" href="/public/detalle.html?id=${encodeURIComponent(item.id)}">
+    <a class="card hover:shadow-sm transition" href="./detalle.html?id=${encodeURIComponent(item.id)}">
       <h3 class="card-title mb-2">${item.titulo||''}</h3>
       <p class="card-meta mb-2">${autores}</p>
       <p class="text-sm text-gray-700 mb-3">${resumen}${item.resumen && item.resumen.length>160 ? '…' : ''}</p>

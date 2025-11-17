@@ -6,6 +6,113 @@
   <title>Detalle del Recurso</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="./css/styles.css">
+  <style> .kv dt{color:#374151;font-weight:600}.kv dd{color:#111827} </style>
+</head>
+<body class="min-h-screen bg-gray-50 text-gray-900">
+  <header class="bg-white border-b">
+    <div class="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
+      <a href="./index.html" class="text-xl font-semibold">Repositorio Digital</a>
+    </div>
+  </header>
+
+  <main class="max-w-5xl mx-auto px-4 py-8">
+    <nav class="text-sm text-gray-600 mb-6"><a href="./index.html" class="hover:underline">Inicio</a> / <span id="breadcrumb-title">Detalle</span></nav>
+
+    <article class="bg-white border rounded-lg p-6">
+      <h1 id="titulo" class="text-2xl font-semibold mb-2"></h1>
+      <div class="flex flex-wrap items-center gap-2 text-sm text-gray-600 mb-4">
+        <span id="anio"></span>
+        <span>·</span>
+        <span id="tipo"></span>
+        <span>·</span>
+        <span id="coleccion"></span>
+      </div>
+
+      <div class="mb-6">
+        <h2 class="text-base font-semibold mb-1">Autores</h2>
+        <ul id="autores" class="list-disc pl-5 text-gray-800"></ul>
+      </div>
+
+      <div class="mb-6">
+        <h2 class="text-base font-semibold mb-1">Resumen</h2>
+        <p id="resumen" class="text-gray-800 whitespace-pre-line"></p>
+      </div>
+
+      <div class="mb-6">
+        <h2 class="text-base font-semibold mb-1">Etiquetas</h2>
+        <div id="etiquetas" class="flex flex-wrap gap-2"></div>
+      </div>
+
+      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mt-6">
+        <div class="flex items-center gap-3">
+          <img id="licencia_badge" alt="Licencia CC" class="h-8">
+          <span id="licencia_texto" class="text-sm text-gray-700"></span>
+        </div>
+        <a id="btn_acceso" href="#" target="_blank" rel="noopener" class="inline-flex items-center justify-center px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md"></a>
+      </div>
+
+      <dl class="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm kv">
+        <div>
+          <dt>Código de documento</dt>
+          <dd id="codigo_documento"></dd>
+        </div>
+        <div>
+          <dt>Fecha de ingreso</dt>
+          <dd id="fecha_ingreso"></dd>
+        </div>
+      </dl>
+    </article>
+  </main>
+
+  <footer class="bg-white border-t">
+    <div class="max-w-5xl mx-auto px-4 py-6 text-sm flex items-center justify-between">
+      <p class="text-gray-600">Contenido bajo licencias Creative Commons</p>
+      <a class="text-indigo-600 hover:underline" href="https://creativecommons.org/about/downloads/" target="_blank" rel="noopener">Acerca de CC</a>
+    </div>
+  </footer>
+
+  <script>
+    const $ = (s, d=document) => d.querySelector(s)
+    function ccBadgeFrom(licencia) {
+      const map = { 'CC BY 4.0':'by','CC BY-SA 4.0':'by-sa','CC BY-ND 4.0':'by-nd','CC BY-NC 4.0':'by-nc','CC BY-NC-SA 4.0':'by-nc-sa','CC BY-NC-ND 4.0':'by-nc-nd','CC0 1.0':'zero' }
+      const slug = map[licencia] || 'by'
+      return `https://licensebuttons.net/l/${slug}/4.0/88x31.png`
+    }
+    async function load() {
+      const url = new URL(location.href)
+      const id = url.searchParams.get('id')
+      if (!id) return
+      const res = await fetch(`/api/recurso?id=${encodeURIComponent(id)}`)
+      if (!res.ok) return
+      const r = await res.json()
+      $('#breadcrumb-title').textContent = r.titulo || 'Detalle'
+      $('#titulo').textContent = r.titulo || ''
+      $('#anio').textContent = r.año_publicacion || ''
+      $('#tipo').textContent = r.tipo_documento || ''
+      $('#coleccion').textContent = r.coleccion || ''
+      $('#autores').innerHTML = (r.autores||[]).map(a=>`<li>${a}</li>`).join('')
+      $('#resumen').textContent = r.resumen || ''
+      $('#etiquetas').innerHTML = (r.etiquetas||[]).map(t=>`<span class="badge badge-gray">${t}</span>`).join('')
+      $('#licencia_badge').src = ccBadgeFrom(r.licencia_cc)
+      $('#licencia_texto').textContent = r.licencia_cc || ''
+      const btn = $('#btn_acceso')
+      btn.textContent = (r.estado_alojamiento === 'ALOJADO') ? 'Descargar' : 'Ir al sitio original'
+      btn.href = r.url_descarga
+      if (r.codigo_documento) $('#codigo_documento').textContent = r.codigo_documento
+      if (r.fecha_ingreso) $('#fecha_ingreso').textContent = new Date(r.fecha_ingreso).toLocaleString()
+    }
+    load()
+  </script>
+</body>
+</html>
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Detalle del Recurso</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="./css/styles.css">
 </head>
 <body class="min-h-screen bg-gray-50 text-gray-900">
   <header class="bg-white border-b">
