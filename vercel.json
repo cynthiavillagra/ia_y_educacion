@@ -29,7 +29,7 @@
     },
     {
       "src": "/(.*)",
-      "dest": "frontend/$1"
+      "dest": "public/$1"
     }
   ],
   "env": {
