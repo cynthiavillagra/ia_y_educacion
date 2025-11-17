@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Repositorio IA y Educación</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="./css/styles.css">
+</head>
+<body class="min-h-screen bg-gray-50 text-gray-900" style="font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif">
+  <header class="bg-white border-b">
+    <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+      <a href="./index.html" class="text-xl font-semibold">Repositorio Digital · IA y Educación</a>
+      <nav class="flex items-center gap-4 text-sm">
+        <a href="./admin/login.html" class="text-gray-600 hover:text-gray-900">Administración</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 py-8">
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+      <aside class="lg:col-span-1 bg-white border rounded-lg p-4 h-fit">
+        <h2 class="text-lg font-semibold mb-4">Filtros</h2>
+        <form id="filters-form" class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium mb-1" for="q">Búsqueda</label>
+            <input id="q" name="q" type="search" placeholder="Título, autor, etiqueta, resumen" class="w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500">
+          </div>
+          <div>
+            <label class="block text-sm font-medium mb-1" for="autor">Autor</label>
+            <input id="autor" name="autor" type="text" class="w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500">
+          </div>
+          <div>
+            <label class="block text-sm font-medium mb-1" for="anio">Año de publicación</label>
+            <input id="anio" name="anio" type="number" min="1900" max="2100" class="w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500">
+          </div>
+          <div>
+            <label class="block text-sm font-medium mb-1" for="coleccion">Colección</label>
+            <input id="coleccion" name="coleccion" type="text" class="w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500">
+          </div>
+          <div>
+            <label class="block text-sm font-medium mb-1" for="tipo">Tipo de documento</label>
+            <select id="tipo" name="tipo" class="w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500">
+              <option value="">Todos</option>
+              <option value="ARTICULO">Artículo</option>
+              <option value="TESIS">Tesis</option>
+              <option value="LIBRO">Libro</option>
+              <option value="INFORME">Informe</option>
+              <option value="OTRO">Otro</option>
+            </select>
+          </div>
+          <div class="flex gap-2">
+            <button id="apply-filters" type="submit" class="inline-flex items-center justify-center px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">Aplicar</button>
+            <button id="clear-filters" type="button" class="inline-flex items-center justify-center px-4 py-2 bg-gray-100 text-gray-900 rounded-md hover:bg-gray-200">Limpiar</button>
+          </div>
+        </form>
+      </aside>
+
+      <section class="lg:col-span-3">
+        <div class="flex items-end justify-between mb-4">
+          <p id="results-count" class="text-sm text-gray-600">0 resultados</p>
+          <div class="flex items-center gap-2">
+            <label for="orden" class="text-sm text-gray-600">Ordenar por</label>
+            <select id="orden" class="rounded-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 text-sm">
+              <option value="relevancia">Relevancia</option>
+              <option value="anio_desc">Año (desc)</option>
+              <option value="anio_asc">Año (asc)</option>
+              <option value="fecha_ingreso_desc">Fecha de ingreso (desc)</option>
+            </select>
+          </div>
+        </div>
+
+        <div id="results" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"></div>
+
+        <div id="pagination" class="mt-8 flex items-center justify-center gap-2"></div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="bg-white border-t">
+    <div class="max-w-7xl mx-auto px-4 py-6 text-sm flex flex-col sm:flex-row items-center justify-between gap-3">
+      <p class="text-gray-600">Repositorio Digital de Acceso Abierto sobre IA y Educación</p>
+      <p class="text-gray-600">Contenido bajo licencias Creative Commons según cada recurso</p>
+    </div>
+  </footer>
+
+  <script src="./js/search.js"></script>
+</body>
+</html>
