@@ -15,6 +15,6 @@ def get_connection():
         dbname="postgres",
         user="postgres",
         password=os.environ["SUPABASE_DB_PASSWORD"],
-        port=5432,
+        port=6543,
         sslmode="require",
     )
