@@ -2,24 +2,34 @@ import os
 import psycopg2
 
 def get_connection():
-    """Return a psycopg2 connection to Supabase using connection pooling."""
+    """Return a psycopg2 connection to Supabase Postgres.
     
-    # Construir la connection string desde las variables básicas
-    supabase_url = os.environ["SUPABASE_URL"]
-    password = os.environ["SUPABASE_DB_PASSWORD"]
+    Required environment variables:
+      - SUPABASE_URL: Your project URL (e.g., https://xxxxx.supabase.co)
+      - SUPABASE_DB_PASSWORD: Your database password
+    """
     
-    # Extraer el project ref de la URL
-    project_ref = supabase_url.replace("https://", "").replace(".supabase.co", "")
+    # Obtener la URL de Supabase
+    supabase_url = os.environ.get("SUPABASE_URL", "")
+    password = os.environ.get("SUPABASE_DB_PASSWORD", "")
     
-    # Host del pooler (ajusta la región si es necesaria)
-    pooler_host = os.environ.get(
-        "SUPABASE_POOLER_HOST", 
-        "aws-0-us-east-1.pooler.supabase.com"
+    if not supabase_url or not password:
+        raise ValueError("Missing SUPABASE_URL or SUPABASE_DB_PASSWORD environment variables")
+    
+    # Extraer el project reference de la URL
+    # De: https://bruvzimzklfjwckpyhrj.supabase.co
+    # A: bruvzimzklfjwckpyhrj
+    project_ref = supabase_url.replace("https://", "").replace("http://", "").split(".")[0]
+    
+    # Usar connection pooling (port 6543) para serverless
+    host = f"aws-0-us-east-1.pooler.supabase.com"
+    user = f"postgres.{project_ref}"
+    
+    return psycopg2.connect(
+        host=host,
+        port=6543,
+        dbname="postgres",
+        user=user,
+        password=password,
+        sslmode="require"
     )
-    
-    connection_string = (
-        f"postgresql://postgres.{project_ref}:{password}@"
-        f"{pooler_host}:6543/postgres?sslmode=require"
-    )
-    
-    return psycopg2.connect(connection_string)
