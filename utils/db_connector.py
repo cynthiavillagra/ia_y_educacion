@@ -2,19 +2,16 @@ import os
 import psycopg2
 
 def get_connection():
-    """Return a psycopg2 connection to Supabase Postgres using env vars.
-
-    Required env:
-      - SUPABASE_URL (e.g. https://xyzcompany.supabase.co)
-      - SUPABASE_DB_PASSWORD (database password)
-    """
-    supabase_url = os.environ["SUPABASE_URL"]
-    host = supabase_url.replace("https://", "").replace(".supabase.co", "") + ".supabase.co"
-    return psycopg2.connect(
-        host=host,
-        dbname="postgres",
-        user="postgres",
-        password=os.environ["SUPABASE_DB_PASSWORD"],
-        port=6543,
-        sslmode="require",
+    """Return a psycopg2 connection to Supabase using connection pooling."""
+    
+    # Si tienes la connection string completa (RECOMENDADO)
+    if "SUPABASE_CONNECTION_STRING" in os.environ:
+        return psycopg2.connect(os.environ["SUPABASE_CONNECTION_STRING"])
+    
+    # Fallback: construir desde partes
+    connection_string = (
+        f"postgresql://postgres.{os.environ['SUPABASE_PROJECT_REF']}:"
+        f"{os.environ['SUPABASE_DB_PASSWORD']}@"
+        f"{os.environ['SUPABASE_POOLER_HOST']}:6543/postgres?sslmode=require"
     )
+    return psycopg2.connect(connection_string)
