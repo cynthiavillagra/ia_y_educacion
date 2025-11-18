@@ -1,41 +1,7 @@
 {
-  "version": 2,
-  "builds": [
-    {
-      "src": "api/*.py",
-      "use": "@vercel/python"
+  "functions": {
+    "api/*.py": {
+      "runtime": "python3.9"
     }
-  ],
-  "routes": [
-    {
-      "src": "/api/test_db",
-      "dest": "api/test_db.py"
-    },
-    {
-      "src": "/api/search",
-      "dest": "api/search.py"
-    },
-    {
-      "src": "/api/recurso_detalle",
-      "dest": "api/recurso_detalle.py"
-    },
-    {
-      "src": "/api/ingestion",
-      "dest": "api/ingestion.py"
-    },
-    {
-      "src": "/api",
-      "dest": "api/index.py"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "public/$1"
-    }
-  ],
-  "env": {
-    "SUPABASE_URL": "@supabase_url",
-    "SUPABASE_SERVICE_KEY": "@supabase_service_key",
-    "STORAGE_BUCKET": "@storage_bucket",
-    "MAX_FILE_SIZE": "@max_file_size"
   }
 }
