@@ -6,7 +6,8 @@ from psycopg2 import OperationalError
 def get_connection():
 
 
-    host = os.getenv("SUPABASE_DB_HOST")
+    raw_host = os.getenv("SUPABASE_DB_HOST")
+    host = (raw_host or "").strip().replace("https://", "").replace("http://", "")
     password = os.getenv("SUPABASE_DB_PASSWORD")
     if not host:
         raise KeyError("SUPABASE_DB_HOST")
