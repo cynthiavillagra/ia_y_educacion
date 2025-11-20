@@ -80,7 +80,10 @@ class handler(BaseHTTPRequestHandler):
                         order_sql = "sr.score DESC"
 
                     items_sql = f"""
-                        SELECT sr.id, r.titulo, r.año_publicacion, sr.score
+                        SELECT sr.id, r.titulo, r.año_publicacion, sr.score,
+                               r.resumen, r.tipo_documento,
+                               COALESCE(json_agg(DISTINCT a.nombre_autor) FILTER (WHERE a.id IS NOT NULL), '[]') as autores,
+                               COALESCE(json_agg(DISTINCT e.nombre_etiqueta) FILTER (WHERE e.id IS NOT NULL), '[]') as etiquetas
                         FROM buscar_recursos(%s) sr
                         JOIN recursos r ON r.id = sr.id
                         LEFT JOIN colecciones c ON c.id = r.id_coleccion
@@ -89,7 +92,7 @@ class handler(BaseHTTPRequestHandler):
                         LEFT JOIN recurso_etiqueta re ON re.recurso_id = r.id
                         LEFT JOIN etiquetas e ON e.id = re.etiqueta_id
                         WHERE {where_clause}
-                        GROUP BY sr.id, r.titulo, r.año_publicacion, sr.score
+                        GROUP BY sr.id, r.titulo, r.año_publicacion, sr.score, r.resumen, r.tipo_documento
                         ORDER BY {order_sql}
                         LIMIT %s OFFSET %s
                     """
@@ -101,7 +104,11 @@ class handler(BaseHTTPRequestHandler):
                         "id": r[0], 
                         "titulo": r[1], 
                         "año_publicacion": r[2], 
-                        "score": float(r[3]) if r[3] is not None else 0.0
+                        "score": float(r[3]) if r[3] is not None else 0.0,
+                        "resumen": r[4],
+                        "tipo_documento": r[5],
+                        "autores": r[6],
+                        "etiquetas": r[7]
                     }
                     for r in rows
                 ]

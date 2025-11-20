@@ -18,7 +18,7 @@ async function loadDetalle() {
   const url = new URL(location.href)
   const id = url.searchParams.get('id')
   if (!id) return
-  const res = await fetch(`/api/recurso/${encodeURIComponent(id)}`)
+  const res = await fetch(`/api/recurso_detalle?id=${encodeURIComponent(id)}`)
   if (!res.ok) return
   const r = await res.json()
 
