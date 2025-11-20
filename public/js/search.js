@@ -1,5 +1,5 @@
-const $ = (s, d=document) => d.querySelector(s)
-const $$ = (s, d=document) => Array.from(d.querySelectorAll(s))
+const $ = (s, d = document) => d.querySelector(s)
+const $$ = (s, d = document) => Array.from(d.querySelectorAll(s))
 
 const state = {
   page: 1,
@@ -26,7 +26,7 @@ function stateToParams() {
   const p = url.searchParams
   p.set('page', String(state.page))
   p.set('orden', state.orden)
-  const map = { q:'#q', autor:'#autor', anio:'#anio', coleccion:'#coleccion', tipo:'#tipo' }
+  const map = { q: '#q', autor: '#autor', anio: '#anio', coleccion: '#coleccion', tipo: '#tipo' }
   Object.entries(map).forEach(([k, sel]) => {
     const v = $(sel).value.trim()
     if (v) p.set(k, v); else p.delete(k)
@@ -38,37 +38,42 @@ function renderPagination(total, page, perPage) {
   const totalPages = Math.max(1, Math.ceil(total / perPage))
   const c = $('#pagination')
   c.innerHTML = ''
-  const btn = (label, target, disabled=false) => {
+  const btn = (label, target, disabled = false) => {
     const a = document.createElement('button')
     a.type = 'button'
     a.textContent = label
-    a.className = `px-3 py-1.5 rounded-md text-sm ${disabled? 'bg-gray-100 text-gray-400' : 'bg-white border hover:bg-gray-50'}`
+    a.className = `px-3 py-1.5 rounded-md text-sm ${disabled ? 'bg-gray-100 text-gray-400' : 'bg-white border hover:bg-gray-50'}`
     if (!disabled) a.addEventListener('click', () => { state.page = target; stateToParams(); search() })
     return a
   }
-  c.append(btn('Anterior', Math.max(1, page-1), page<=1))
+  c.append(btn('Anterior', Math.max(1, page - 1), page <= 1))
   const windowSize = 5
-  const start = Math.max(1, page - Math.floor(windowSize/2))
+  const start = Math.max(1, page - Math.floor(windowSize / 2))
   const end = Math.min(totalPages, start + windowSize - 1)
-  for (let i=start; i<=end; i++) {
+  for (let i = start; i <= end; i++) {
     const b = btn(String(i), i, false)
     if (i === page) b.className = 'px-3 py-1.5 rounded-md text-sm bg-indigo-600 text-white'
     c.append(b)
   }
-  c.append(btn('Siguiente', Math.min(totalPages, page+1), page>=totalPages))
+  c.append(btn('Siguiente', Math.min(totalPages, page + 1), page >= totalPages))
 }
 
 function cardTemplate(item) {
-  const autores = (item.autores||[]).join('; ')
-  const resumen = (item.resumen||'').slice(0, 160)
+  const autores = (item.autores || []).join('; ')
+  const resumen = (item.resumen || '').slice(0, 160)
   return `
-    <a class="card hover:shadow-sm transition" href="./detalle.html?id=${encodeURIComponent(item.id)}">
-      <h3 class="card-title mb-2">${item.titulo||''}</h3>
-      <p class="card-meta mb-2">${autores}</p>
-      <p class="text-sm text-gray-700 mb-3">${resumen}${item.resumen && item.resumen.length>160 ? '…' : ''}</p>
-      <div class="mt-auto flex items-center justify-between text-sm text-gray-600">
-        <span>${item.año_publicacion||''}</span>
-        <span class="badge badge-gray">${item.tipo_documento||''}</span>
+    <a class="card hover:shadow-sm transition flex flex-col h-full p-4 border rounded-lg bg-white" href="./detalle.html?id=${encodeURIComponent(item.id)}">
+      <h3 class="card-title text-lg font-semibold mb-2 text-gray-900">${item.titulo || ''}</h3>
+      <p class="card-meta text-sm text-gray-600 mb-2">${autores}</p>
+      <p class="text-sm text-gray-700 mb-3 flex-grow">${resumen}${item.resumen && item.resumen.length > 160 ? '…' : ''}</p>
+      
+      <div class="mb-3 flex flex-wrap gap-1">
+        ${(item.etiquetas || []).slice(0, 3).map(t => `<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800">${t}</span>`).join('')}
+      </div>
+
+      <div class="mt-auto flex items-center justify-between text-sm text-gray-500 pt-2 border-t">
+        <span>${item.año_publicacion || ''}</span>
+        <span class="px-2 py-1 rounded bg-indigo-50 text-indigo-700 text-xs font-medium">${item.tipo_documento || ''}</span>
       </div>
     </a>
   `
