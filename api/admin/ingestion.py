@@ -7,10 +7,12 @@ import requests
 import cgi
 from io import BytesIO
 
-# Add parent directory to path to import utils
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+# Add parent directory to path to import utils and auth
+# We are in api/admin, so we need to go up two levels to reach root
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
 from utils.db_connector import get_connection
+from api.auth import verify_token
 
 SERVICE_KEY = os.environ.get("SUPABASE_SERVICE_KEY", "")
 SUPABASE_URL = os.environ.get("SUPABASE_URL", "")
@@ -38,18 +40,10 @@ def _upload_to_storage(file_bytes: bytes, filename: str) -> str:
 
 class handler(BaseHTTPRequestHandler):
     
-    def _auth_ok(self):
-        """Check authorization header"""
-        auth = self.headers.get("authorization") or self.headers.get("Authorization")
-        if not auth or not auth.lower().startswith("bearer "):
-            return False
-        token = auth.split(" ", 1)[1].strip()
-        return token == SERVICE_KEY
-    
     def do_POST(self):
         """Handle resource ingestion with file upload"""
         try:
-            if not self._auth_ok():
+            if not verify_token(self.headers):
                 self.send_response(401)
                 self.send_header('Content-type', 'application/json')
                 self.send_header('Access-Control-Allow-Origin', '*')
