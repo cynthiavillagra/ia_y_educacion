@@ -28,22 +28,33 @@ RETURNS TABLE (
   score REAL
 ) AS $$
 BEGIN
-  RETURN QUERY
-  SELECT
-    r.id,
-    r.titulo,
-    r.año_publicacion,
-    ts_rank(r.vector_busqueda, plainto_tsquery('spanish', p_query)) AS score
-  FROM recursos r
-  LEFT JOIN recurso_autor ra ON r.id = ra.recurso_id
-  LEFT JOIN autores a ON ra.autor_id = a.id
-  LEFT JOIN recurso_etiqueta re ON r.id = re.recurso_id
-  LEFT JOIN etiquetas e ON re.etiqueta_id = e.id
-  WHERE
-    r.vector_busqueda @@ plainto_tsquery('spanish', p_query)
-    OR a.nombre_autor ILIKE '%' || p_query || '%'
-    OR e.nombre_etiqueta ILIKE '%' || p_query || '%'
-  GROUP BY r.id
-  ORDER BY score DESC;
+  IF p_query IS NULL OR TRIM(p_query) = '' THEN
+    RETURN QUERY
+    SELECT
+      r.id,
+      r.titulo,
+      r.año_publicacion,
+      0.0::REAL AS score
+    FROM recursos r
+    ORDER BY r.fecha_ingreso DESC;
+  ELSE
+    RETURN QUERY
+    SELECT
+      r.id,
+      r.titulo,
+      r.año_publicacion,
+      ts_rank(r.vector_busqueda, plainto_tsquery('spanish', p_query)) AS score
+    FROM recursos r
+    LEFT JOIN recurso_autor ra ON r.id = ra.recurso_id
+    LEFT JOIN autores a ON ra.autor_id = a.id
+    LEFT JOIN recurso_etiqueta re ON r.id = re.recurso_id
+    LEFT JOIN etiquetas e ON re.etiqueta_id = e.id
+    WHERE
+      r.vector_busqueda @@ plainto_tsquery('spanish', p_query)
+      OR a.nombre_autor ILIKE '%' || p_query || '%'
+      OR e.nombre_etiqueta ILIKE '%' || p_query || '%'
+    GROUP BY r.id
+    ORDER BY score DESC;
+  END IF;
 END;
 $$ LANGUAGE plpgsql;

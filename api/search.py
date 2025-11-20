@@ -42,8 +42,9 @@ class handler(BaseHTTPRequestHandler):
                     query_params = []
                     
                     if autor:
-                        filters.append("a.nombre_autor ILIKE '%' || %s || '%'")
-                        query_params.append(autor)
+                        # Fix: Use EXISTS and Python-side string formatting for safe ILIKE
+                        filters.append("EXISTS (SELECT 1 FROM recurso_autor ra_f JOIN autores a_f ON ra_f.autor_id = a_f.id WHERE ra_f.recurso_id = r.id AND a_f.nombre_autor ILIKE %s)")
+                        query_params.append(f"%{autor}%")
                     if anio:
                         filters.append("r.año_publicacion = %s")
                         query_params.append(int(anio))
