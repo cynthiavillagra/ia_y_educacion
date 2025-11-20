@@ -8,6 +8,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="../css/autocomplete.css">
 </head>
 
 <body class="min-h-screen bg-gray-50 text-gray-900 font-sans">
@@ -69,16 +70,21 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div class="space-y-1">
                     <label class="block text-sm font-semibold text-gray-700" for="autores">Autores</label>
-                    <input id="autores" name="autores" type="text" placeholder="Apellido, Nombre; Otro Autor" required
-                        class="w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 transition-colors">
-                    <p class="text-xs text-gray-500">Separados por punto y coma (;)</p>
+                    <div class="autocomplete-container">
+                        <input id="autores" name="autores" type="text" placeholder="Apellido, Nombre; Otro Autor"
+                            required
+                            class="w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 transition-colors">
+                        <div id="autores-dropdown" class="autocomplete-dropdown"></div>
+                    </div>
+                    <p class="text-xs text-gray-500">Separados por punto y coma (;). Escribe para ver sugerencias.</p>
                 </div>
                 <div class="space-y-1">
                     <label class="block text-sm font-semibold text-gray-700" for="etiquetas">Etiquetas</label>
-                    <input id="etiquetas" name="etiquetas" type="text" placeholder="ética, IA, educación"
-                        list="etiquetas-list"
-                        class="w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 transition-colors">
-                    <datalist id="etiquetas-list"></datalist>
+                    <div class="autocomplete-container">
+                        <input id="etiquetas" name="etiquetas" type="text" placeholder="ética, IA, educación"
+                            class="w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 transition-colors">
+                        <div id="etiquetas-dropdown" class="autocomplete-dropdown"></div>
+                    </div>
                     <p class="text-xs text-gray-500">Separadas por coma (,). Escribe para ver sugerencias.</p>
                 </div>
             </div>
@@ -118,10 +124,10 @@
                 </div>
             </div>
 
-            <div id="group-alojado" class="hidden p-4 bg-gray-50 rounded-lg border border-gray-200">
+            <div id="group-aloj" class="hidden p-4 bg-gray-50 rounded-lg border border-gray-200">
                 <label class="block text-sm font-semibold text-gray-700 mb-2" for="archivo">Reemplazar Archivo</label>
                 <input id="archivo" name="archivo" type="file" accept=".pdf,.doc,.docx"
-                    class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
+                    class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
                 <p class="text-xs text-gray-500 mt-2">Formatos: PDF, DOCX. Máx 10 MB. Dejar vacío para mantener el
                     actual.</p>
             </div>
@@ -139,11 +145,12 @@
                 </button>
                 <a href="../index.html"
                     class="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">Cancelar</a>
-                <span id="edic-status" class="text-sm font-medium ml-auto"></span>
+                <span id="edicion-status" class="text-sm font-medium ml-auto"></span>
             </div>
         </form>
     </main>
 
+    <script src="../js/autocomplete.js"></script>
     <script src="../js/admin.js"></script>
     <script>
         async function initSupabase() {

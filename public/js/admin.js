@@ -51,12 +51,37 @@ async function loadTags() {
     if (!res.ok) return
     const tags = await res.json()
 
-    const datalist = document.getElementById('etiquetas-list')
-    if (datalist) {
-      datalist.innerHTML = tags.map(tag => `<option value="${tag}"></option>`).join('')
+    // Initialize etiquetas autocomplete
+    if (window.etiquetasAutocomplete) {
+      window.etiquetasAutocomplete.setSuggestions(tags)
     }
   } catch (e) {
     console.error('Error loading tags:', e)
+  }
+}
+
+async function loadAuthors() {
+  try {
+    const res = await fetch('/api/autores')
+    if (!res.ok) return
+    const authors = await res.json()
+
+    // Initialize autores autocomplete
+    if (window.autoresAutocomplete) {
+      window.autoresAutocomplete.setSuggestions(authors)
+    }
+  } catch (e) {
+    console.error('Error loading authors:', e)
+  }
+}
+
+function setupAutocomplete() {
+  // Create autocomplete instances
+  if (document.getElementById('etiquetas') && window.MultiAutocomplete) {
+    window.etiquetasAutocomplete = new window.MultiAutocomplete('etiquetas', 'etiquetas-dropdown', [], ',')
+  }
+  if (document.getElementById('autores') && window.MultiAutocomplete) {
+    window.autoresAutocomplete = new window.MultiAutocomplete('autores', 'autores-dropdown', [], ';')
   }
 }
 
@@ -173,7 +198,9 @@ function initAdmin() {
   // Only check auth on pages that are NOT login
   if (!location.pathname.includes('login.html')) {
     requireAuthOrRedirect()
+    setupAutocomplete()  // Setup autocomplete components
     loadTags()  // Load tags for autocomplete
+    loadAuthors()  // Load authors for autocomplete
     handleIngestionInit()
     handleEditionInit()
   }
