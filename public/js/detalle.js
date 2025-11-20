@@ -56,13 +56,22 @@ async function loadDetalle() {
 
   const btn = $('#btn_acceso')
   if (r.estado_alojamiento === 'ALOJADO') {
-    btn.textContent = 'Descargar'
+    btn.textContent = '📥 Descargar documento'
     btn.href = r.url_descarga
+    btn.title = 'Descargar el archivo PDF'
   } else {
-    // Show the actual URL for ORIGINAL resources
-    btn.textContent = r.url_descarga || 'Ir al sitio original'
+    btn.textContent = '🔗 Ver documento original'
     btn.href = r.url_descarga
-    btn.classList.add('text-xs', 'break-all')  // Make URL readable
+    btn.title = r.url_descarga || 'Ver en sitio original'
+
+    // Add URL below the button
+    const urlDisplay = document.createElement('a')
+    urlDisplay.href = r.url_descarga
+    urlDisplay.target = '_blank'
+    urlDisplay.rel = 'noopener'
+    urlDisplay.textContent = r.url_descarga
+    urlDisplay.className = 'text-xs text-gray-500 hover:text-indigo-600 break-all block mt-2'
+    btn.parentElement.appendChild(urlDisplay)
   }
 
   if (r.codigo_documento) {
