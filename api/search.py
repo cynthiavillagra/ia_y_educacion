@@ -43,7 +43,9 @@ class handler(BaseHTTPRequestHandler):
                     
                     if autor:
                         # Fix: Use EXISTS and Python-side string formatting for safe ILIKE
-                        filters.append("EXISTS (SELECT 1 FROM recurso_autor ra_f JOIN autores a_f ON ra_f.autor_id = a_f.id WHERE ra_f.recurso_id = r.id AND a_f.nombre_autor ILIKE %s)")
+                        # Also include collection name in the search as per user request
+                        filters.append("(EXISTS (SELECT 1 FROM recurso_autor ra_f JOIN autores a_f ON ra_f.autor_id = a_f.id WHERE ra_f.recurso_id = r.id AND a_f.nombre_autor ILIKE %s) OR c.nombre ILIKE %s)")
+                        query_params.append(f"%{autor}%")
                         query_params.append(f"%{autor}%")
                     if anio:
                         filters.append("r.año_publicacion = %s")
@@ -84,7 +86,8 @@ class handler(BaseHTTPRequestHandler):
                         SELECT sr.id, r.titulo, r.año_publicacion, sr.score,
                                r.resumen, r.tipo_documento,
                                COALESCE(json_agg(DISTINCT a.nombre_autor) FILTER (WHERE a.id IS NOT NULL), '[]') as autores,
-                               COALESCE(json_agg(DISTINCT e.nombre_etiqueta) FILTER (WHERE e.id IS NOT NULL), '[]') as etiquetas
+                               COALESCE(json_agg(DISTINCT e.nombre_etiqueta) FILTER (WHERE e.id IS NOT NULL), '[]') as etiquetas,
+                               c.nombre as coleccion
                         FROM buscar_recursos(%s) sr
                         JOIN recursos r ON r.id = sr.id
                         LEFT JOIN colecciones c ON c.id = r.id_coleccion
@@ -93,7 +96,7 @@ class handler(BaseHTTPRequestHandler):
                         LEFT JOIN recurso_etiqueta re ON re.recurso_id = r.id
                         LEFT JOIN etiquetas e ON e.id = re.etiqueta_id
                         WHERE {where_clause}
-                        GROUP BY sr.id, r.titulo, r.año_publicacion, sr.score, r.resumen, r.tipo_documento
+                        GROUP BY sr.id, r.titulo, r.año_publicacion, sr.score, r.resumen, r.tipo_documento, c.nombre
                         ORDER BY {order_sql}
                         LIMIT %s OFFSET %s
                     """
@@ -109,7 +112,8 @@ class handler(BaseHTTPRequestHandler):
                         "resumen": r[4],
                         "tipo_documento": r[5],
                         "autores": r[6],
-                        "etiquetas": r[7]
+                        "etiquetas": r[7],
+                        "coleccion": r[8]
                     }
                     for r in rows
                 ]

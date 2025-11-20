@@ -64,6 +64,7 @@ function cardTemplate(item) {
   return `
     <a class="card hover:shadow-sm transition flex flex-col h-full p-4 border rounded-lg bg-white" href="./detalle.html?id=${encodeURIComponent(item.id)}">
       <h3 class="card-title text-lg font-semibold mb-2 text-gray-900">${item.titulo || ''}</h3>
+      <div class="text-xs font-medium text-indigo-600 mb-1 uppercase tracking-wide">${item.coleccion || ''}</div>
       <p class="card-meta text-sm text-gray-600 mb-2">${autores}</p>
       <p class="text-sm text-gray-700 mb-3 flex-grow">${resumen}${item.resumen && item.resumen.length > 160 ? '…' : ''}</p>
       
