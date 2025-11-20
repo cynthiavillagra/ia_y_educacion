@@ -59,8 +59,10 @@ async function loadDetalle() {
     btn.textContent = 'Descargar'
     btn.href = r.url_descarga
   } else {
-    btn.textContent = 'Ir al sitio original'
+    // Show the actual URL for ORIGINAL resources
+    btn.textContent = r.url_descarga || 'Ir al sitio original'
     btn.href = r.url_descarga
+    btn.classList.add('text-xs', 'break-all')  // Make URL readable
   }
 
   if (r.codigo_documento) {
