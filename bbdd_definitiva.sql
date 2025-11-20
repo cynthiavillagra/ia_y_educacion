@@ -104,3 +104,80 @@ BEGIN
   END IF;
 END;
 $$ LANGUAGE plpgsql;
+
+-- 5. Row Level Security (RLS)
+-- Activar RLS en todas las tablas
+ALTER TABLE public.recursos ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.autores ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.etiquetas ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.colecciones ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.recurso_autor ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.recurso_etiqueta ENABLE ROW LEVEL SECURITY;
+
+-- Políticas para recursos
+CREATE POLICY "Público puede ver recursos" ON public.recursos
+  FOR SELECT
+  USING (true);
+
+CREATE POLICY "Solo admins insertan recursos" ON public.recursos
+  FOR INSERT
+  WITH CHECK (auth.role() = 'authenticated');
+
+CREATE POLICY "Solo admins actualizan recursos" ON public.recursos
+  FOR UPDATE
+  USING (auth.role() = 'authenticated')
+  WITH CHECK (auth.role() = 'authenticated');
+
+CREATE POLICY "Solo admins eliminan recursos" ON public.recursos
+  FOR DELETE
+  USING (auth.role() = 'authenticated');
+
+-- Políticas para autores
+CREATE POLICY "Público puede ver autores" ON public.autores
+  FOR SELECT
+  USING (true);
+
+CREATE POLICY "Solo admins modifican autores" ON public.autores
+  FOR ALL
+  USING (auth.role() = 'authenticated')
+  WITH CHECK (auth.role() = 'authenticated');
+
+-- Políticas para etiquetas
+CREATE POLICY "Público puede ver etiquetas" ON public.etiquetas
+  FOR SELECT
+  USING (true);
+
+CREATE POLICY "Solo admins modifican etiquetas" ON public.etiquetas
+  FOR ALL
+  USING (auth.role() = 'authenticated')
+  WITH CHECK (auth.role() = 'authenticated');
+
+-- Políticas para colecciones
+CREATE POLICY "Público puede ver colecciones" ON public.colecciones
+  FOR SELECT
+  USING (true);
+
+CREATE POLICY "Solo admins modifican colecciones" ON public.colecciones
+  FOR ALL
+  USING (auth.role() = 'authenticated')
+  WITH CHECK (auth.role() = 'authenticated');
+
+-- Políticas para recurso_autor
+CREATE POLICY "Público puede ver recurso_autor" ON public.recurso_autor
+  FOR SELECT
+  USING (true);
+
+CREATE POLICY "Solo admins modifican recurso_autor" ON public.recurso_autor
+  FOR ALL
+  USING (auth.role() = 'authenticated')
+  WITH CHECK (auth.role() = 'authenticated');
+
+-- Políticas para recurso_etiqueta
+CREATE POLICY "Público puede ver recurso_etiqueta" ON public.recurso_etiqueta
+  FOR SELECT
+  USING (true);
+
+CREATE POLICY "Solo admins modifican recurso_etiqueta" ON public.recurso_etiqueta
+  FOR ALL
+  USING (auth.role() = 'authenticated')
+  WITH CHECK (auth.role() = 'authenticated');

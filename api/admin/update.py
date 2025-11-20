@@ -13,6 +13,12 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspa
 from utils.db_connector import get_connection
 from api.auth import verify_token
 from utils.normalize import normalize_tag
+from utils.validators import (
+    validate_year, validate_url, validate_tipo_documento,
+    validate_estado_alojamiento, validate_string_length,
+    validate_doi, validate_licencia, validate_list_not_empty,
+    sanitize_text, ValidationError
+)
 
 SERVICE_KEY = os.environ.get("SUPABASE_SERVICE_KEY", "")
 SUPABASE_URL = os.environ.get("SUPABASE_URL", "")
@@ -149,16 +155,57 @@ class handler(BaseHTTPRequestHandler):
                 # Actually, let's enforce it if it's empty.
                 pass
 
+            # VALIDATE ALL INPUTS
+            try:
+                # Validate and sanitize text fields
+                titulo = validate_string_length(sanitize_text(form_data.get("titulo", "")), "Título", 500)
+                resumen = sanitize_text(form_data.get("resumen", ""))
+                if resumen:
+                    resumen = validate_string_length(resumen, "Resumen", 5000, min_length=0)
+                
+                # Validate year
+                año = validate_year(int(form_data.get("año_publicacion")))
+                
+                # Validate estado and tipo
+                estado = validate_estado_alojamiento(estado)
+                tipo_doc = validate_tipo_documento(form_data.get("tipo_documento", ""))
+                
+                # Validate URL if provided
+                if url_descarga:
+                    url_descarga = validate_url(url_descarga)
+                
+                # Validate license
+                licencia = validate_licencia(form_data.get("licencia_cc", ""))
+                
+                # Validate colección
+                coleccion = validate_string_length(sanitize_text(form_data.get("coleccion", "")), "Colección", 200)
+                
+                # Validate DOI/ISBN (optional)
+                codigo_doc = validate_doi(form_data.get("codigo_documento"))
+                
+                # Validate authors and tags not empty
+                validate_list_not_empty(autores, "Autores")
+                
+            except ValidationError as e:
+                self.send_response(400)
+                self.send_header('Content-type', 'application/json')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.end_headers()
+                
+                response = {"error": f"Validación fallida: {str(e)}"}
+                self.wfile.write(json.dumps(response).encode())
+                return
+
             recurso = {
-                "titulo": form_data.get("titulo", "").strip(),
-                "resumen": form_data.get("resumen", ""),
-                "codigo_documento": form_data.get("codigo_documento") or None,
-                "año_publicacion": int(form_data.get("año_publicacion")),
+                "titulo": titulo,
+                "resumen": resumen,
+                "codigo_documento": codigo_doc,
+                "año_publicacion": año,
                 "estado_alojamiento": estado,
                 "url_descarga": url_descarga,
-                "licencia_cc": form_data.get("licencia_cc", "").strip(),
-                "coleccion": form_data.get("coleccion", "").strip(),
-                "tipo_documento": form_data.get("tipo_documento", "").strip(),
+                "licencia_cc": licencia,
+                "coleccion": coleccion,
+                "tipo_documento": tipo_doc,
                 "autores": autores,
                 "etiquetas": etiquetas,
             }
