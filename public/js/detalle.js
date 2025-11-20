@@ -77,10 +77,42 @@ async function loadDetalle() {
   // Check admin auth
   const token = localStorage.getItem('sb_access_token')
   if (token) {
+    const editContainer = $('#edit-container')
+    if (editContainer) {
+      editContainer.classList.remove('hidden')
+    }
+
     const btnEdit = $('#btn-editar')
     if (btnEdit) {
       btnEdit.href = `/admin/edicion.html?id=${id}`
-      btnEdit.classList.remove('hidden')
+    }
+
+    const btnDelete = $('#btn-eliminar')
+    if (btnDelete) {
+      btnDelete.addEventListener('click', async () => {
+        const confirmMessage = `¿Estás segura de que deseas eliminar este recurso?\n\nTítulo: ${r.titulo}\n\nEsta acción no se puede deshacer.`
+        if (!confirm(confirmMessage)) return
+
+        try {
+          const res = await fetch(`/api/admin/delete?id=${encodeURIComponent(id)}`, {
+            method: 'DELETE',
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          })
+
+          if (!res.ok) {
+            const err = await res.json()
+            alert('Error al eliminar: ' + (err.error || 'Desconocido'))
+            return
+          }
+
+          alert('Recurso eliminado correctamente')
+          location.href = '/index.html'
+        } catch (e) {
+          alert('Error al eliminar el recurso: ' + e.message)
+        }
+      })
     }
 
     const btnLogout = $('#btn-logout')
