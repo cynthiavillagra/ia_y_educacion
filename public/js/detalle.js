@@ -1,4 +1,4 @@
-const $ = (s, d=document) => d.querySelector(s)
+const $ = (s, d = document) => d.querySelector(s)
 
 function ccBadgeFrom(licencia) {
   const map = {
@@ -29,12 +29,27 @@ async function loadDetalle() {
   $('#coleccion').textContent = r.coleccion || ''
 
   const autores = r.autores || []
-  $('#autores').innerHTML = autores.map(a => `<li>${a}</li>`).join('')
+  if (autores.length > 0) {
+    $('#autores').innerHTML = autores.map(a => `<li>${a}</li>`).join('')
+    $('#autores').parentElement.style.display = 'block'
+  } else {
+    $('#autores').parentElement.style.display = 'none'
+  }
 
-  $('#resumen').textContent = r.resumen || ''
+  if (r.resumen) {
+    $('#resumen').textContent = r.resumen
+    $('#resumen').parentElement.style.display = 'block'
+  } else {
+    $('#resumen').parentElement.style.display = 'none'
+  }
 
   const tags = r.etiquetas || []
-  $('#etiquetas').innerHTML = tags.map(t => `<span class="badge badge-gray">${t}</span>`).join('')
+  if (tags.length > 0) {
+    $('#etiquetas').innerHTML = tags.map(t => `<span class="badge badge-gray">${t}</span>`).join('')
+    $('#etiquetas').parentElement.style.display = 'block'
+  } else {
+    $('#etiquetas').parentElement.style.display = 'none'
+  }
 
   $('#licencia_badge').src = ccBadgeFrom(r.licencia_cc)
   $('#licencia_texto').textContent = r.licencia_cc || ''
@@ -48,8 +63,16 @@ async function loadDetalle() {
     btn.href = r.url_descarga
   }
 
-  if (r.codigo_documento) $('#codigo_documento').textContent = r.codigo_documento
-  if (r.fecha_ingreso) $('#fecha_ingreso').textContent = new Date(r.fecha_ingreso).toLocaleString()
+  if (r.codigo_documento) {
+    $('#codigo_documento').textContent = r.codigo_documento
+    $('#codigo_documento').parentElement.style.display = 'block'
+  } else {
+    $('#codigo_documento').parentElement.style.display = 'none'
+  }
+
+  if (r.fecha_ingreso) {
+    $('#fecha_ingreso').textContent = new Date(r.fecha_ingreso).toLocaleString()
+  }
 }
 
 loadDetalle()
