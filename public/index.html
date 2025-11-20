@@ -1,5 +1,6 @@
 <!doctype html>
 <html lang="es">
+
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -10,11 +11,13 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="./css/styles.css">
 </head>
-<body class="min-h-screen bg-gray-50 text-gray-900" style="font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif">
+
+<body class="min-h-screen bg-gray-50 text-gray-900"
+  style="font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif">
   <header class="bg-white border-b">
     <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
       <a href="./index.html" class="text-xl font-semibold">Repositorio Digital · IA y Educación</a>
-      <nav class="flex items-center gap-4 text-sm">
+      <nav id="header-nav" class="flex items-center gap-4 text-sm">
         <a href="./admin/login.html" class="text-gray-600 hover:text-gray-900">Administración</a>
       </nav>
     </div>
@@ -27,23 +30,28 @@
         <form id="filters-form" class="space-y-4">
           <div>
             <label class="block text-sm font-medium mb-1" for="q">Búsqueda</label>
-            <input id="q" name="q" type="search" placeholder="Título, autor, etiqueta, resumen" class="w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500">
+            <input id="q" name="q" type="search" placeholder="Título, autor, etiqueta, resumen"
+              class="w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500">
           </div>
           <div>
             <label class="block text-sm font-medium mb-1" for="autor">Autor</label>
-            <input id="autor" name="autor" type="text" class="w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500">
+            <input id="autor" name="autor" type="text"
+              class="w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500">
           </div>
           <div>
             <label class="block text-sm font-medium mb-1" for="anio">Año de publicación</label>
-            <input id="anio" name="anio" type="number" min="1900" max="2100" class="w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500">
+            <input id="anio" name="anio" type="number" min="1900" max="2100"
+              class="w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500">
           </div>
           <div>
             <label class="block text-sm font-medium mb-1" for="coleccion">Colección</label>
-            <input id="coleccion" name="coleccion" type="text" class="w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500">
+            <input id="coleccion" name="coleccion" type="text"
+              class="w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500">
           </div>
           <div>
             <label class="block text-sm font-medium mb-1" for="tipo">Tipo de documento</label>
-            <select id="tipo" name="tipo" class="w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500">
+            <select id="tipo" name="tipo"
+              class="w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500">
               <option value="">Todos</option>
               <option value="ARTICULO">Artículo</option>
               <option value="TESIS">Tesis</option>
@@ -53,8 +61,10 @@
             </select>
           </div>
           <div class="flex gap-2">
-            <button id="apply-filters" type="submit" class="inline-flex items-center justify-center px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">Aplicar</button>
-            <button id="clear-filters" type="button" class="inline-flex items-center justify-center px-4 py-2 bg-gray-100 text-gray-900 rounded-md hover:bg-gray-200">Limpiar</button>
+            <button id="apply-filters" type="submit"
+              class="inline-flex items-center justify-center px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">Aplicar</button>
+            <button id="clear-filters" type="button"
+              class="inline-flex items-center justify-center px-4 py-2 bg-gray-100 text-gray-900 rounded-md hover:bg-gray-200">Limpiar</button>
           </div>
         </form>
       </aside>
@@ -87,6 +97,28 @@
     </div>
   </footer>
 
+
+  <script>
+    // Check if user is logged in and update header navigation
+    (function () {
+      const token = localStorage.getItem('sb_access_token')
+      const nav = document.getElementById('header-nav')
+      if (token && nav) {
+        nav.innerHTML = `
+          <a href="./admin/ingestion.html" class="text-gray-600 hover:text-indigo-600 font-medium transition-colors">Nuevo Recurso</a>
+          <button id="home-logout" class="text-red-600 hover:text-red-800 font-medium transition-colors">Cerrar sesión</button>
+        `
+        const logoutBtn = document.getElementById('home-logout')
+        if (logoutBtn) {
+          logoutBtn.addEventListener('click', () => {
+            localStorage.removeItem('sb_access_token')
+            location.reload()
+          })
+        }
+      }
+    })()
+  </script>
   <script src="./js/search.js"></script>
 </body>
+
 </html>
