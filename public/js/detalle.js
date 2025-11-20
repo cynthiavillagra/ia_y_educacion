@@ -96,4 +96,3 @@ async function loadDetalle() {
 }
 
 loadDetalle()
-  ```
