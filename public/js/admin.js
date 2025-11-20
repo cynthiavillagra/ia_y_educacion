@@ -45,6 +45,21 @@ async function requireAuthOrRedirect() {
   if (!token) { location.href = '/admin/login.html'; return }
 }
 
+async function loadTags() {
+  try {
+    const res = await fetch('/api/etiquetas')
+    if (!res.ok) return
+    const tags = await res.json()
+
+    const datalist = document.getElementById('etiquetas-list')
+    if (datalist) {
+      datalist.innerHTML = tags.map(tag => `<option value="${tag}"></option>`).join('')
+    }
+  } catch (e) {
+    console.error('Error loading tags:', e)
+  }
+}
+
 async function handleIngestionInit() {
   const form = document.getElementById('ingestion-form')
   if (!form) return
@@ -158,6 +173,7 @@ function initAdmin() {
   // Only check auth on pages that are NOT login
   if (!location.pathname.includes('login.html')) {
     requireAuthOrRedirect()
+    loadTags()  // Load tags for autocomplete
     handleIngestionInit()
     handleEditionInit()
   }

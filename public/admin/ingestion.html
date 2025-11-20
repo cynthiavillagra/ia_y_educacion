@@ -71,9 +71,10 @@
         </div>
         <div class="space-y-1">
           <label class="block text-sm font-semibold text-gray-700" for="etiquetas">Etiquetas</label>
-          <input id="etiquetas" name="etiquetas" type="text" placeholder="ética, IA, educación"
+          <input id="etiquetas" name="etiquetas" type="text" placeholder="ética, IA, educación" list="etiquetas-list"
             class="w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 transition-colors">
-          <p class="text-xs text-gray-500">Separadas por coma (,)</p>
+          <datalist id="etiquetas-list"></datalist>
+          <p class="text-xs text-gray-500">Separadas por coma (,). Escribe para ver sugerencias.</p>
         </div>
       </div>
 

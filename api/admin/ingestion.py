@@ -13,6 +13,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspa
 
 from utils.db_connector import get_connection
 from api.auth import verify_token
+from utils.normalize import normalize_tag
 
 SERVICE_KEY = os.environ.get("SUPABASE_SERVICE_KEY", "")
 SUPABASE_URL = os.environ.get("SUPABASE_URL", "")
@@ -220,10 +221,14 @@ class handler(BaseHTTPRequestHandler):
 
                         # Etiquetas (crear si no existen)
                         for tag in recurso["etiquetas"]:
-                            cur.execute("SELECT id FROM etiquetas WHERE nombre_etiqueta=%s", (tag,))
+                            normalized_tag = normalize_tag(tag)
+                            if not normalized_tag:
+                                continue  # Skip empty tags
+                            
+                            cur.execute("SELECT id FROM etiquetas WHERE nombre_etiqueta=%s", (normalized_tag,))
                             e = cur.fetchone()
                             if not e:
-                                cur.execute("INSERT INTO etiquetas (nombre_etiqueta) VALUES (%s) RETURNING id", (tag,))
+                                cur.execute("INSERT INTO etiquetas (nombre_etiqueta) VALUES (%s) RETURNING id", (normalized_tag,))
                                 etiqueta_id = cur.fetchone()[0]
                             else:
                                 etiqueta_id = e[0]
