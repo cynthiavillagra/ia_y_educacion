@@ -25,7 +25,7 @@ async function handleLoginInit() {
     const { data, error } = await supabase.auth.signInWithPassword({ email, password })
     if (error) { out.textContent = 'Credenciales inválidas'; out.classList.remove('hidden'); return }
     setToken(data.session?.access_token)
-    location.href = '/public/admin/ingestion.html'
+    location.href = '/admin/ingestion.html'
   })
 }
 
@@ -42,7 +42,7 @@ async function requireAuthOrRedirect() {
   const form = document.getElementById('ingestion-form')
   if (!form) return
   const token = getToken()
-  if (!token) { location.href = '/public/admin/login.html'; return }
+  if (!token) { location.href = '/admin/login.html'; return }
 }
 
 async function handleIngestionInit() {
@@ -55,7 +55,7 @@ async function handleIngestionInit() {
   document.getElementById('logout').addEventListener('click', async () => {
     await supabase.auth.signOut()
     clearToken()
-    location.href = '/public/admin/login.html'
+    location.href = '/admin/login.html'
   })
 
   form.addEventListener('submit', async (e) => {
