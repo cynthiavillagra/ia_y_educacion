@@ -79,10 +79,21 @@ async function loadDetalle() {
   if (token) {
     const btnEdit = $('#btn-editar')
     if (btnEdit) {
-      btnEdit.href = `/public/admin/edicion.html?id=${id}`
+      btnEdit.href = `/admin/edicion.html?id=${id}`
       btnEdit.classList.remove('hidden')
+    }
+
+    const btnLogout = $('#btn-logout')
+    if (btnLogout) {
+      btnLogout.classList.remove('hidden')
+      btnLogout.addEventListener('click', async () => {
+        // We can try to sign out from supabase if we had the client, but clearing token is enough for UI
+        localStorage.removeItem('sb_access_token')
+        location.reload()
+      })
     }
   }
 }
 
 loadDetalle()
+  ```
