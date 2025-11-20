@@ -73,6 +73,16 @@ async function loadDetalle() {
   if (r.fecha_ingreso) {
     $('#fecha_ingreso').textContent = new Date(r.fecha_ingreso).toLocaleString()
   }
+
+  // Check admin auth
+  const token = localStorage.getItem('sb_access_token')
+  if (token) {
+    const btnEdit = $('#btn-editar')
+    if (btnEdit) {
+      btnEdit.href = `/public/admin/edicion.html?id=${id}`
+      btnEdit.classList.remove('hidden')
+    }
+  }
 }
 
 loadDetalle()

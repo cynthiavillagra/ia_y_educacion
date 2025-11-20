@@ -1,5 +1,6 @@
 <!doctype html>
 <html lang="es">
+
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -8,6 +9,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link rel="stylesheet" href="../css/styles.css">
 </head>
+
 <body class="min-h-screen bg-gray-50 text-gray-900">
   <header class="bg-white border-b">
     <div class="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
@@ -22,42 +24,50 @@
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label class="block text-sm font-medium mb-1" for="titulo">Título</label>
-          <input id="titulo" name="titulo" type="text" required class="w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500">
+          <input id="titulo" name="titulo" type="text" required
+            class="w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500">
         </div>
         <div>
           <label class="block text-sm font-medium mb-1" for="codigo_documento">Código (DOI/ISBN)</label>
-          <input id="codigo_documento" name="codigo_documento" type="text" class="w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500">
+          <input id="codigo_documento" name="codigo_documento" type="text"
+            class="w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500">
         </div>
         <div>
           <label class="block text-sm font-medium mb-1" for="anio">Año de publicación</label>
-          <input id="anio" name="año_publicacion" type="number" min="1900" max="2100" required class="w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500">
+          <input id="anio" name="año_publicacion" type="number" min="1900" max="2100" required
+            class="w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500">
         </div>
         <div>
           <label class="block text-sm font-medium mb-1" for="coleccion">Colección</label>
-          <input id="coleccion" name="coleccion" type="text" required class="w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500">
+          <input id="coleccion" name="coleccion" type="text" required
+            class="w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500">
         </div>
       </div>
 
       <div>
         <label class="block text-sm font-medium mb-1" for="resumen">Resumen</label>
-        <textarea id="resumen" name="resumen" rows="5" class="w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500"></textarea>
+        <textarea id="resumen" name="resumen" rows="5"
+          class="w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500"></textarea>
       </div>
 
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label class="block text-sm font-medium mb-1" for="autores">Autores (separados por ;)</label>
-          <input id="autores" name="autores" type="text" placeholder="Apellido, Nombre; Otro Autor" required class="w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500">
+          <input id="autores" name="autores" type="text" placeholder="Apellido, Nombre; Otro Autor" required
+            class="w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500">
         </div>
         <div>
           <label class="block text-sm font-medium mb-1" for="etiquetas">Etiquetas (separadas por ,)</label>
-          <input id="etiquetas" name="etiquetas" type="text" placeholder="ética, IA, educación" class="w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500">
+          <input id="etiquetas" name="etiquetas" type="text" placeholder="ética, IA, educación"
+            class="w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500">
         </div>
       </div>
 
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div>
           <label class="block text-sm font-medium mb-1" for="tipo_documento">Tipo de documento</label>
-          <select id="tipo_documento" name="tipo_documento" required class="w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500">
+          <select id="tipo_documento" name="tipo_documento" required
+            class="w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500">
             <option value="ARTICULO">Artículo</option>
             <option value="TESIS">Tesis</option>
             <option value="LIBRO">Libro</option>
@@ -67,14 +77,16 @@
         </div>
         <div>
           <label class="block text-sm font-medium mb-1" for="estado_alojamiento">Origen</label>
-          <select id="estado_alojamiento" name="estado_alojamiento" required class="w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500">
+          <select id="estado_alojamiento" name="estado_alojamiento" required
+            class="w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500">
             <option value="ALOJADO">Alojado</option>
             <option value="ORIGINAL">Original</option>
           </select>
         </div>
         <div>
           <label class="block text-sm font-medium mb-1" for="licencia_cc">Licencia CC</label>
-          <select id="licencia_cc" name="licencia_cc" required class="w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500">
+          <select id="licencia_cc" name="licencia_cc" required
+            class="w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500">
             <option value="CC BY 4.0">CC BY 4.0</option>
             <option value="CC BY-SA 4.0">CC BY-SA 4.0</option>
             <option value="CC BY-ND 4.0">CC BY-ND 4.0</option>
@@ -93,21 +105,42 @@
 
       <div id="group-original" class="hidden">
         <label class="block text-sm font-medium mb-1" for="url_descarga">URL externa</label>
-        <input id="url_descarga" name="url_descarga" type="url" class="w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500">
+        <input id="url_descarga" name="url_descarga" type="url"
+          class="w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500">
       </div>
 
       <div class="flex items-center gap-3">
-        <button type="submit" class="inline-flex items-center justify-center px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md">Guardar recurso</button>
+        <button type="submit"
+          class="inline-flex items-center justify-center px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md">Guardar
+          recurso</button>
         <span id="ingestion-status" class="text-sm"></span>
       </div>
     </form>
   </main>
 
-  <script>
-    const SUPABASE_URL = window.SUPABASE_URL || ''
-    const SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || ''
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
-  </script>
   <script src="../js/admin.js"></script>
+  <script>
+    async function initSupabase() {
+      try {
+        const res = await fetch('/api/config')
+        if (!res.ok) throw new Error('Failed to load config')
+        const config = await res.json()
+        window.SUPABASE_URL = config.SUPABASE_URL
+        window.SUPABASE_ANON_KEY = config.SUPABASE_ANON_KEY
+        window.supabase = window.supabase.createClient(config.SUPABASE_URL, config.SUPABASE_ANON_KEY)
+        return true
+      } catch (e) {
+        console.error('Error initializing Supabase:', e)
+        return false
+      }
+    }
+
+    initSupabase().then(ok => {
+      if (ok && window.initAdmin) {
+        window.initAdmin()
+      }
+    })
+  </script>
 </body>
+
 </html>

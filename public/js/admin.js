@@ -1,4 +1,4 @@
-const $ = (s, d=document) => d.querySelector(s)
+const $ = (s, d = document) => d.querySelector(s)
 
 function getToken() {
   const v = localStorage.getItem('sb_access_token')
@@ -63,8 +63,8 @@ async function handleIngestionInit() {
     const status = document.getElementById('ingestion-status')
     status.textContent = 'Guardando…'
     const fd = new FormData(form)
-    const autores = (document.getElementById('autores').value||'').split(';').map(s=>s.trim()).filter(Boolean)
-    const etiquetas = (document.getElementById('etiquetas').value||'').split(',').map(s=>s.trim()).filter(Boolean)
+    const autores = (document.getElementById('autores').value || '').split(';').map(s => s.trim()).filter(Boolean)
+    const etiquetas = (document.getElementById('etiquetas').value || '').split(',').map(s => s.trim()).filter(Boolean)
     fd.set('autores', JSON.stringify(autores))
     fd.set('etiquetas', JSON.stringify(etiquetas))
 
@@ -80,6 +80,16 @@ async function handleIngestionInit() {
   })
 }
 
-handleLoginInit()
-requireAuthOrRedirect()
-handleIngestionInit()
+function initAdmin() {
+  handleLoginInit()
+  // Only check auth on pages that are NOT login
+  if (!location.pathname.includes('login.html')) {
+    requireAuthOrRedirect()
+    handleIngestionInit()
+    handleEditionInit()
+  }
+}
+
+// Expose to global scope
+window.initAdmin = initAdmin
+
