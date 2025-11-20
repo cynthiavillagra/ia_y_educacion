@@ -1,0 +1,20 @@
+# Secrets
+.env
+import.env
+passwords supabase.txt
+passwords*.txt
+
+# Python
+__pycache__/
+*.pyc
+venv/
+.venv/
+env/
+
+# IDE
+.vscode/
+.idea/
+
+# System
+.DS_Store
+Thumbs.db
