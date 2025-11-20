@@ -153,8 +153,8 @@ async function handleEditionInit() {
 
     toggleOrigenFields()
   } catch (e) {
-    console.error(e)
-    alert('Error al cargar datos del recurso')
+    console.error('Error al cargar datos del recurso:', e)
+    // Don't show alert, data might still load partially
   }
 
   const selOrigen = document.getElementById('estado_alojamiento')
