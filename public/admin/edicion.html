@@ -5,104 +5,141 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Edición de Recurso</title>
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div>
-            <label class="block text-sm font-medium mb-1" for="titulo">Título</label>
-            <input id="titulo" name="titulo" type="text" required
-                class="w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500">
-        </div>
-        <div>
-            <label class="block text-sm font-medium mb-1" for="codigo_documento">Código (DOI/ISBN)</label>
-            <input id="codigo_documento" name="codigo_documento" type="text"
-                class="w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500">
-        </div>
-        <div>
-            <label class="block text-sm font-medium mb-1" for="anio">Año de publicación</label>
-            <input id="anio" name="año_publicacion" type="number" min="1900" max="2100" required
-                class="w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500">
-        </div>
-        <div>
-            <label class="block text-sm font-medium mb-1" for="coleccion">Colección</label>
-            <input id="coleccion" name="coleccion" type="text" required
-                class="w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500">
-        </div>
-    </div>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="../css/styles.css">
+</head>
 
-    <div>
-        <label class="block text-sm font-medium mb-1" for="resumen">Resumen</label>
-        <textarea id="resumen" name="resumen" rows="5"
-            class="w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500"></textarea>
-    </div>
-
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div>
-            <label class="block text-sm font-medium mb-1" for="autores">Autores (separados por ;)</label>
-            <input id="autores" name="autores" type="text" placeholder="Apellido, Nombre; Otro Autor" required
-                class="w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500">
+<body class="min-h-screen bg-gray-50 text-gray-900 font-sans">
+    <header class="bg-white border-b shadow-sm sticky top-0 z-10">
+        <div class="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
+            <a href="../index.html" class="text-xl font-bold text-indigo-600 tracking-tight">Repositorio Digital</a>
+            <nav class="flex items-center gap-6">
+                <a href="../index.html"
+                    class="text-sm font-medium text-gray-600 hover:text-indigo-600 transition-colors">Buscar /
+                    Inicio</a>
+                <a href="ingestion.html"
+                    class="text-sm font-medium text-gray-600 hover:text-indigo-600 transition-colors">Nuevo Recurso</a>
+                <button id="logout" class="text-sm font-medium text-red-600 hover:text-red-800 transition-colors">Cerrar
+                    sesión</button>
+            </nav>
         </div>
-        <div>
-            <label class="block text-sm font-medium mb-1" for="etiquetas">Etiquetas (separadas por ,)</label>
-            <input id="etiquetas" name="etiquetas" type="text" placeholder="ética, IA, educación"
-                class="w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500">
-        </div>
-    </div>
+    </header>
 
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div>
-            <label class="block text-sm font-medium mb-1" for="tipo_documento">Tipo de documento</label>
-            <select id="tipo_documento" name="tipo_documento" required
-                class="w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500">
-                <option value="ARTICULO">Artículo</option>
-                <option value="TESIS">Tesis</option>
-                <option value="LIBRO">Libro</option>
-                <option value="INFORME">Informe</option>
-                <option value="OTRO">Otro</option>
-            </select>
+    <main class="max-w-4xl mx-auto px-4 py-10">
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900">Editar Recurso</h1>
+            <p class="text-gray-500 mt-2">Modifique los detalles del recurso o reemplace el archivo asociado.</p>
         </div>
-        <div>
-            <label class="block text-sm font-medium mb-1" for="estado_alojamiento">Origen</label>
-            <select id="estado_alojamiento" name="estado_alojamiento" required
-                class="w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500">
-                <option value="ALOJADO">Alojado</option>
-                <option value="ORIGINAL">Original</option>
-            </select>
-        </div>
-        <div>
-            <label class="block text-sm font-medium mb-1" for="licencia_cc">Licencia CC</label>
-            <select id="licencia_cc" name="licencia_cc" required
-                class="w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500">
-                <option value="CC BY 4.0">CC BY 4.0</option>
-                <option value="CC BY-SA 4.0">CC BY-SA 4.0</option>
-                <option value="CC BY-ND 4.0">CC BY-ND 4.0</option>
-                <option value="CC BY-NC 4.0">CC BY-NC 4.0</option>
-                <option value="CC BY-NC-SA 4.0">CC BY-NC-SA 4.0</option>
-                <option value="CC BY-NC-ND 4.0">CC BY-NC-ND 4.0</option>
-                <option value="CC0 1.0">CC0 1.0</option>
-            </select>
-        </div>
-    </div>
 
-    <div id="group-alojado" class="hidden">
-        <label class="block text-sm font-medium mb-1" for="archivo">Reemplazar Archivo (PDF/DOCX, máx 10
-            MB)</label>
-        <input id="archivo" name="archivo" type="file" accept=".pdf,.doc,.docx" class="w-full text-sm">
-        <p class="text-xs text-gray-500 mt-1">Dejar vacío para mantener el archivo actual.</p>
-    </div>
+        <form id="edicion-form" class="bg-white border border-gray-200 rounded-xl shadow-sm p-8 space-y-6"
+            enctype="multipart/form-data">
+            <input type="hidden" id="recurso_id" name="id">
 
-    <div id="group-original" class="hidden">
-        <label class="block text-sm font-medium mb-1" for="url_descarga">URL externa</label>
-        <input id="url_descarga" name="url_descarga" type="url"
-            class="w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500">
-    </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="space-y-1">
+                    <label class="block text-sm font-semibold text-gray-700" for="titulo">Título</label>
+                    <input id="titulo" name="titulo" type="text" required
+                        class="w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 transition-colors">
+                </div>
+                <div class="space-y-1">
+                    <label class="block text-sm font-semibold text-gray-700" for="codigo_documento">Código
+                        (DOI/ISBN)</label>
+                    <input id="codigo_documento" name="codigo_documento" type="text"
+                        class="w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 transition-colors">
+                </div>
+                <div class="space-y-1">
+                    <label class="block text-sm font-semibold text-gray-700" for="anio">Año de publicación</label>
+                    <input id="anio" name="año_publicacion" type="number" min="1900" max="2100" required
+                        class="w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 transition-colors">
+                </div>
+                <div class="space-y-1">
+                    <label class="block text-sm font-semibold text-gray-700" for="coleccion">Colección</label>
+                    <input id="coleccion" name="coleccion" type="text" required
+                        class="w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 transition-colors">
+                </div>
+            </div>
 
-    <div class="flex items-center gap-3">
-        <button type="submit"
-            class="inline-flex items-center justify-center px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md">Guardar
-            Cambios</button>
-        <a href="../index.html" class="text-sm text-gray-600 hover:text-gray-900">Cancelar</a>
-        <span id="edicion-status" class="text-sm"></span>
-    </div>
-    </form>
+            <div class="space-y-1">
+                <label class="block text-sm font-semibold text-gray-700" for="resumen">Resumen</label>
+                <textarea id="resumen" name="resumen" rows="4"
+                    class="w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 transition-colors"></textarea>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="space-y-1">
+                    <label class="block text-sm font-semibold text-gray-700" for="autores">Autores</label>
+                    <input id="autores" name="autores" type="text" placeholder="Apellido, Nombre; Otro Autor" required
+                        class="w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 transition-colors">
+                    <p class="text-xs text-gray-500">Separados por punto y coma (;)</p>
+                </div>
+                <div class="space-y-1">
+                    <label class="block text-sm font-semibold text-gray-700" for="etiquetas">Etiquetas</label>
+                    <input id="etiquetas" name="etiquetas" type="text" placeholder="ética, IA, educación"
+                        class="w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 transition-colors">
+                    <p class="text-xs text-gray-500">Separadas por coma (,)</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="space-y-1">
+                    <label class="block text-sm font-semibold text-gray-700" for="tipo_documento">Tipo</label>
+                    <select id="tipo_documento" name="tipo_documento" required
+                        class="w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 transition-colors">
+                        <option value="ARTICULO">Artículo</option>
+                        <option value="TESIS">Tesis</option>
+                        <option value="LIBRO">Libro</option>
+                        <option value="INFORME">Informe</option>
+                        <option value="OTRO">Otro</option>
+                    </select>
+                </div>
+                <div class="space-y-1">
+                    <label class="block text-sm font-semibold text-gray-700" for="estado_alojamiento">Origen</label>
+                    <select id="estado_alojamiento" name="estado_alojamiento" required
+                        class="w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 transition-colors">
+                        <option value="ALOJADO">Alojado</option>
+                        <option value="ORIGINAL">Original</option>
+                    </select>
+                </div>
+                <div class="space-y-1">
+                    <label class="block text-sm font-semibold text-gray-700" for="licencia_cc">Licencia</label>
+                    <select id="licencia_cc" name="licencia_cc" required
+                        class="w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 transition-colors">
+                        <option value="CC BY 4.0">CC BY 4.0</option>
+                        <option value="CC BY-SA 4.0">CC BY-SA 4.0</option>
+                        <option value="CC BY-ND 4.0">CC BY-ND 4.0</option>
+                        <option value="CC BY-NC 4.0">CC BY-NC 4.0</option>
+                        <option value="CC BY-NC-SA 4.0">CC BY-NC-SA 4.0</option>
+                        <option value="CC BY-NC-ND 4.0">CC BY-NC-ND 4.0</option>
+                        <option value="CC0 1.0">CC0 1.0</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="group-alojado" class="hidden p-4 bg-gray-50 rounded-lg border border-gray-200">
+                <label class="block text-sm font-semibold text-gray-700 mb-2" for="archivo">Reemplazar Archivo</label>
+                <input id="archivo" name="archivo" type="file" accept=".pdf,.doc,.docx"
+                    class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
+                <p class="text-xs text-gray-500 mt-2">Formatos: PDF, DOCX. Máx 10 MB. Dejar vacío para mantener el
+                    actual.</p>
+            </div>
+
+            <div id="group-original" class="hidden">
+                <label class="block text-sm font-semibold text-gray-700 mb-1" for="url_descarga">URL externa</label>
+                <input id="url_descarga" name="url_descarga" type="url" placeholder="https://..."
+                    class="w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 transition-colors">
+            </div>
+
+            <div class="pt-4 flex items-center gap-4 border-t border-gray-100">
+                <button type="submit"
+                    class="inline-flex items-center justify-center px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg shadow-sm transition-all focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    Guardar Cambios
+                </button>
+                <a href="../index.html"
+                    class="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">Cancelar</a>
+                <span id="edicion-status" class="text-sm font-medium ml-auto"></span>
+            </div>
+        </form>
     </main>
 
     <script src="../js/admin.js"></script>
@@ -128,6 +165,6 @@
             }
         })
     </script>
-    </body>
+</body>
 
 </html>

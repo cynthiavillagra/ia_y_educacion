@@ -10,23 +10,32 @@
   <link rel="stylesheet" href="../css/styles.css">
 </head>
 
-<body class="min-h-screen bg-gray-50 text-gray-900 grid place-items-center p-4">
-  <div class="w-full max-w-md bg-white border rounded-lg p-6">
-    <h1 class="text-xl font-semibold mb-6 text-center">Acceso de Administración</h1>
-    <form id="login-form" class="space-y-4">
-      <div>
-        <label class="block text-sm font-medium mb-1" for="email">Email</label>
+<body class="min-h-screen bg-gray-50 text-gray-900 font-sans grid place-items-center p-4">
+  <div class="w-full max-w-md bg-white border border-gray-200 rounded-xl shadow-lg p-8">
+    <div class="text-center mb-8">
+      <h1 class="text-2xl font-bold text-indigo-600 tracking-tight">Repositorio Digital</h1>
+      <p class="text-gray-500 mt-2 text-sm">Acceso al panel de administración</p>
+    </div>
+
+    <form id="login-form" class="space-y-6">
+      <div class="space-y-1">
+        <label class="block text-sm font-semibold text-gray-700" for="email">Email</label>
         <input id="email" name="email" type="email" required
-          class="w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500">
+          class="w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 transition-colors px-4 py-2">
       </div>
-      <div>
-        <label class="block text-sm font-medium mb-1" for="password">Contraseña</label>
+      <div class="space-y-1">
+        <label class="block text-sm font-semibold text-gray-700" for="password">Contraseña</label>
         <input id="password" name="password" type="password" required
-          class="w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500">
+          class="w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 transition-colors px-4 py-2">
       </div>
+
       <button type="submit"
-        class="w-full inline-flex items-center justify-center px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">Ingresar</button>
-      <p id="login-error" class="text-sm text-red-600 mt-2 hidden"></p>
+        class="w-full inline-flex items-center justify-center px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg shadow-sm transition-all focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+        Ingresar
+      </button>
+
+      <div id="login-error"
+        class="p-3 bg-red-50 text-red-700 text-sm rounded-lg hidden border border-red-100 text-center"></div>
     </form>
   </div>
 
