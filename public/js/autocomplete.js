@@ -40,18 +40,28 @@ class MultiAutocomplete {
             s.toLowerCase().includes(token.toLowerCase())
         )
 
+        // Check if there's an exact match (case insensitive)
+        const exactMatch = filtered.some(s => s.toLowerCase() === token.toLowerCase())
+
+        // If no exact match and user has typed something, show "create new" option
+        if (!exactMatch && token.trim().length > 0) {
+            filtered.push(`Crear nuevo: ${token}`)
+        }
+
         if (filtered.length === 0) {
             this.hideDropdown()
             return
         }
 
-        this.showDropdown(filtered)
+        this.showDropdown(filtered, token)
     }
 
-    showDropdown(items) {
-        this.dropdown.innerHTML = items.map((item, idx) =>
-            `<div class="autocomplete-item" data-index="${idx}">${item}</div>`
-        ).join('')
+    showDropdown(items, currentToken = '') {
+        this.dropdown.innerHTML = items.map((item, idx) => {
+            const isNew = item.startsWith('Crear nuevo:')
+            const className = isNew ? 'autocomplete-item new-item' : 'autocomplete-item'
+            return `<div class="${className}" data-index="${idx}">${item}</div>`
+        }).join('')
 
         this.dropdown.classList.add('show')
         this.selectedIndex = -1
@@ -68,6 +78,12 @@ class MultiAutocomplete {
     }
 
     selectItem(value) {
+        // Extract actual value if it's a "Crear nuevo" option
+        let actualValue = value
+        if (value.startsWith('Crear nuevo: ')) {
+            actualValue = value.replace('Crear nuevo: ', '')
+        }
+
         const cursorPos = this.input.selectionStart
         const fullValue = this.input.value
         const beforeCursor = fullValue.substring(0, cursorPos)
@@ -84,7 +100,7 @@ class MultiAutocomplete {
         } else if (beforeToken.length > 0) {
             newValue += ' '
         }
-        newValue += value
+        newValue += actualValue
 
         // Add separator and space if this is not the last item
         if (afterToken.length > 0) {

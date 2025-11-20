@@ -38,3 +38,13 @@
 .autocomplete-item.selected {
   font-weight: 500;
 }
+
+.autocomplete-item.new-item {
+  color: #059669;
+  font-weight: 500;
+  border-top: 1px solid #e5e7eb;
+}
+
+.autocomplete-item.new-item:before {
+  content: "✨ ";
+}
