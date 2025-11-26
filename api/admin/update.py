@@ -1,3 +1,18 @@
+from http.server import BaseHTTPRequestHandler
+import json
+import sys
+import os
+import uuid
+import requests
+import cgi
+from io import BytesIO
+
+# Add parent directory to path to import utils and auth
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+
+from utils.db_connector import get_connection
+from api.auth import verify_token
+from utils.normalize import normalize_tag
 from utils.validators import (
     validate_year, validate_url, validate_tipo_documento,
     validate_estado_alojamiento, validate_string_length,

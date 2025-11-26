@@ -1,17 +1,3 @@
-# -----------------------------------------------------------------------------
-# ARCHIVO LEGACY (OBSOLETO)
-# -----------------------------------------------------------------------------
-# ESTE ARCHIVO YA NO SE USA EN LA NUEVA ARQUITECTURA.
-#
-# Reemplazo:
-# La lógica de verificación de tokens se ha movido a:
-# -> `utils/auth.py`
-#
-# Razón:
-# Centralizar la seguridad en un módulo de utilidades reutilizable, en lugar
-# de tener scripts sueltos en la carpeta api/.
-# -----------------------------------------------------------------------------
-
 import os
 import jwt  # Requiere: pip install PyJWT
 
