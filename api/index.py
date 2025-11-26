@@ -1,3 +1,11 @@
+from server.http_server import RequestHandler
+from server.material_handler import handle_get_material, handle_list_materials, handle_upload_material, handle_options
+
+# -----------------------------------------------------------------------------
+# ARCHIVO: VERCEL ENTRY POINT (Punto de entrada Serverless)
+# -----------------------------------------------------------------------------
+# ¿Por qué?
+# Vercel funciona con "Serverless Functions". No corre un servidor infinito (`while True`).
 # En su lugar, Vercel busca una variable `handler` que sea una clase HTTP.
 # Cuando llega una petición, Vercel instancia esa clase y maneja UN solo request.
 #
@@ -11,9 +19,7 @@
 RequestHandler.router.add_route("GET", "/api/material/get", handle_get_material)
 RequestHandler.router.add_route("GET", "/api/material/list", handle_list_materials)
 RequestHandler.router.add_route("POST", "/api/material/upload", handle_upload_material)
-RequestHandler.router.add_route("POST", "/api/material/upload", handle_upload_material)
 RequestHandler.router.add_route("OPTIONS", "/api/material/.*", handle_options)
-RequestHandler.router.add_route("GET", "/api/debug", handle_debug)
 
 # Rutas Legacy
 RequestHandler.router.add_route("GET", "/api/recurso_detalle", handle_get_material)
