@@ -1,3 +1,16 @@
+# -----------------------------------------------------------------------------
+# ARCHIVO LEGACY (OBSOLETO)
+# -----------------------------------------------------------------------------
+# ESTE ARCHIVO YA NO SE USA EN LA NUEVA ARQUITECTURA.
+#
+# Reemplazo:
+# El modelo de dominio se encuentra en:
+# -> `domain/material.py`
+#
+# Razón:
+# Uso de Dataclasses modernas y separación de lógica de validación (Service) vs Modelo (Domain).
+# -----------------------------------------------------------------------------
+
 from dataclasses import dataclass, field
 from typing import List, Optional
 

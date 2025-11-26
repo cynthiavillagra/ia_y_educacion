@@ -1,6 +1,19 @@
 from dataclasses import dataclass
 from typing import List, Optional
 
+# -----------------------------------------------------------------------------
+# CAPA: DOMAIN (Dominio)
+# -----------------------------------------------------------------------------
+# ¿Por qué?
+# En aplicaciones simples, a veces pasamos diccionarios o JSONs crudos por todos lados.
+# Eso es propenso a errores (typos en claves, no saber qué campos existen).
+#
+# ¿Qué logramos?
+# 1. Definición Formal: Esta clase es el "contrato" de qué es un Material en nuestro sistema.
+# 2. Type Hinting: El editor nos ayuda (autocompletado) porque sabe que `material.titulo` existe.
+# 3. Independencia: Este objeto NO depende de la base de datos ni de la API. Es puro Python.
+# -----------------------------------------------------------------------------
+
 @dataclass
 class Material:
     id: int
@@ -18,6 +31,10 @@ class Material:
     etiquetas: List[str]
 
     def to_dict(self):
+        """
+        Helper para convertir el objeto a diccionario, útil para serializar a JSON
+        en la respuesta HTTP.
+        """
         return {
             "id": self.id,
             "titulo": self.titulo,

@@ -1,3 +1,16 @@
+# -----------------------------------------------------------------------------
+# ARCHIVO LEGACY (OBSOLETO)
+# -----------------------------------------------------------------------------
+# ESTE ARCHIVO YA NO SE USA EN LA NUEVA ARQUITECTURA.
+#
+# Reemplazo:
+# Las pruebas de conexión deben hacerse con:
+# -> `utils/db.py` (usando `get_connection()`)
+#
+# Razón:
+# Este era un script de prueba manual.
+# -----------------------------------------------------------------------------
+
 from http.server import BaseHTTPRequestHandler
 import json
 import sys

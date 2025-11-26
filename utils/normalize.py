@@ -1,3 +1,16 @@
+# -----------------------------------------------------------------------------
+# UTILITY: Normalization
+# -----------------------------------------------------------------------------
+# Propósito:
+# Proporcionar funciones para normalizar texto, útil para búsquedas y
+# consistencia de datos (tags, autores, etc.).
+#
+# Funcionalidad:
+# - Eliminación de acentos (NFD).
+# - Conversión a minúsculas.
+# - Limpieza de espacios.
+# -----------------------------------------------------------------------------
+
 import unicodedata
 
 

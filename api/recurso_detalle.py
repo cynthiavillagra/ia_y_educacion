@@ -7,6 +7,22 @@ from urllib.parse import parse_qs
 # Add parent directory to path to import utils
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+# -----------------------------------------------------------------------------
+# ARCHIVO LEGACY (OBSOLETO)
+# -----------------------------------------------------------------------------
+# ESTE ARCHIVO YA NO SE USA EN LA NUEVA ARQUITECTURA.
+#
+# Reemplazo:
+# La lógica de obtener detalle se ha movido a:
+# -> `repositories/material_repository.py` (Método `get_by_id`)
+# -> `services/material_service.py` (Método `get_material`)
+# -> `server/material_handler.py` (Función `handle_get_material`)
+#
+# Razón:
+# Implementar el patrón Repository para reutilizar la consulta SQL y
+# el patrón Adapter para devolver un objeto limpio en lugar de tuplas crudas.
+# -----------------------------------------------------------------------------
+
 from utils.db_connector import get_connection
 
 class handler(BaseHTTPRequestHandler):

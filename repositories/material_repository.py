@@ -5,11 +5,32 @@ from repositories.supabase_client import supabase_client
 from domain.material import Material
 from adapters.material_adapter import to_material
 
+# -----------------------------------------------------------------------------
+# PATRÓN DE DISEÑO: REPOSITORY (Repositorio)
+# -----------------------------------------------------------------------------
+# ¿Por qué?
+# El código que accede a la base de datos (SQL, conexiones, cursores) es "sucio"
+# y técnico. No queremos mezclarlo con la lógica de negocio (reglas, validaciones).
+#
+# ¿Qué logramos?
+# 1. Abstracción: El Servicio pide "dame el material 5" (`get_by_id`). No le importa
+#    si viene de Postgres, de un archivo JSON o de una API externa.
+# 2. Centralización: Todo el SQL vive acá. Si hay que optimizar una query, sabemos
+#    exactamente dónde buscar.
+# 3. Testabilidad: Es fácil crear un "FakeMaterialRepository" para tests que no
+#    necesite base de datos real.
+# -----------------------------------------------------------------------------
+
 class MaterialRepository:
     def get_by_id(self, material_id: int) -> Optional[Material]:
+        """
+        Busca un material por ID y devuelve un objeto de Dominio.
+        Usa el patrón Adapter (`to_material`) al final para limpiar la salida.
+        """
         conn = get_connection()
         try:
             with conn.cursor() as cur:
+                # Query principal a la tabla recursos + join con colecciones
                 cur.execute(
                     """
                     SELECT r.id, r.titulo, r.resumen, r.año_publicacion, r.fecha_ingreso,
@@ -25,7 +46,7 @@ class MaterialRepository:
                 if not row:
                     return None
 
-                # Get authors
+                # Sub-query para autores (relación muchos a muchos)
                 cur.execute(
                     """
                     SELECT a.nombre_autor
@@ -38,7 +59,7 @@ class MaterialRepository:
                 )
                 autores = [r[0] for r in cur.fetchall()]
 
-                # Get tags
+                # Sub-query para etiquetas
                 cur.execute(
                     """
                     SELECT e.nombre_etiqueta
@@ -51,7 +72,7 @@ class MaterialRepository:
                 )
                 etiquetas = [r[0] for r in cur.fetchall()]
 
-                # Map to domain
+                # Construimos un diccionario intermedio para pasarlo al Adapter
                 data = {
                     "id": row[0],
                     "titulo": row[1],
@@ -65,11 +86,16 @@ class MaterialRepository:
                     "codigo_documento": row[9],
                     "coleccion": row[10]
                 }
+                # Usamos el Adapter para devolver un objeto limpio
                 return to_material(data, autores, etiquetas)
         finally:
             conn.close()
 
     def search(self, query: str, filters: Dict[str, Any], page: int = 1, per_page: int = 20, order: str = "relevancia") -> Dict[str, Any]:
+        """
+        Realiza una búsqueda compleja con filtros dinámicos.
+        Mantiene la lógica SQL encapsulada aquí.
+        """
         offset = (page - 1) * per_page
         conn = get_connection()
         try:
@@ -77,6 +103,7 @@ class MaterialRepository:
                 sql_filters = []
                 query_params = []
                 
+                # Construcción dinámica de filtros SQL
                 autor = filters.get("autor")
                 if autor:
                     sql_filters.append("(EXISTS (SELECT 1 FROM recurso_autor ra_f JOIN autores a_f ON ra_f.autor_id = a_f.id WHERE ra_f.recurso_id = r.id AND a_f.nombre_autor ILIKE %s) OR c.nombre ILIKE %s)")
@@ -97,17 +124,7 @@ class MaterialRepository:
 
                 where_clause = (" AND ".join(sql_filters)) if sql_filters else "TRUE"
 
-                # Count total
-                total_sql = f"""
-                    SELECT COUNT(DISTINCT r.id)
-                    FROM buscar_recursos(%s) sr
-                    JOIN recursos r ON r.id = sr.id
-                    JOIN colecciones c ON c.id = r.id_coleccion
-                    WHERE {where_clause}
-                """
-                # Note: The original query had LEFT JOINs for authors/tags in count, but COUNT(DISTINCT r.id) doesn't need them unless filtering by them.
-                # The filter logic for authors is a subquery (EXISTS), so we don't need the LEFT JOINs for filtering.
-                # However, to be safe and match original logic exactly:
+                # 1. Contar total de resultados (para paginación)
                 total_sql = f"""
                     SELECT COUNT(DISTINCT r.id)
                     FROM buscar_recursos(%s) sr
@@ -118,7 +135,7 @@ class MaterialRepository:
                 cur.execute(total_sql, [query] + query_params)
                 total = cur.fetchone()[0]
 
-                # Order
+                # 2. Definir ordenamiento
                 if order == "anio_asc":
                     order_sql = "r.año_publicacion ASC, sr.score DESC"
                 elif order == "anio_desc":
@@ -128,7 +145,8 @@ class MaterialRepository:
                 else:
                     order_sql = "sr.score DESC"
 
-                # Fetch items
+                # 3. Obtener los items paginados
+                # Usamos json_agg para traer autores y etiquetas en la misma query (optimización)
                 items_sql = f"""
                     SELECT sr.id, r.titulo, r.año_publicacion, sr.score,
                            r.resumen, r.tipo_documento,
@@ -150,6 +168,7 @@ class MaterialRepository:
                 cur.execute(items_sql, [query] + query_params + [per_page, offset])
                 rows = cur.fetchall()
 
+                # Mapeo simple a diccionario
                 items = [
                     {
                         "id": r[0], 
@@ -169,18 +188,22 @@ class MaterialRepository:
             conn.close()
 
     def create(self, data: Dict[str, Any]) -> int:
+        """
+        Inserta un nuevo recurso en la base de datos.
+        Maneja transacciones implícitas (autores, etiquetas, recurso).
+        """
         conn = get_connection()
         try:
-            with conn:
+            with conn: # Context manager maneja commit/rollback automáticamente
                 with conn.cursor() as cur:
-                    # Get collection ID
+                    # 1. Resolver ID de colección
                     cur.execute("SELECT id FROM colecciones WHERE nombre=%s", (data["coleccion"],))
                     row = cur.fetchone()
                     if not row:
                         raise ValueError("Colección inexistente")
                     id_coleccion = row[0]
 
-                    # Insert resource
+                    # 2. Insertar Recurso
                     cur.execute(
                         """
                         INSERT INTO recursos (titulo, resumen, codigo_documento, año_publicacion, estado_alojamiento,
@@ -196,7 +219,7 @@ class MaterialRepository:
                     )
                     recurso_id = cur.fetchone()[0]
 
-                    # Authors
+                    # 3. Manejar Autores (Insertar si no existen + Relación)
                     orden = 1
                     for nombre in data["autores"]:
                         cur.execute("SELECT id FROM autores WHERE nombre_autor=%s", (nombre,))
@@ -212,8 +235,7 @@ class MaterialRepository:
                         )
                         orden += 1
 
-                    # Tags
-                    # Note: Tag normalization should happen in Service layer before calling Repository
+                    # 4. Manejar Etiquetas
                     for tag in data["etiquetas"]:
                         cur.execute("SELECT id FROM etiquetas WHERE nombre_etiqueta=%s", (tag,))
                         e = cur.fetchone()
@@ -232,15 +254,17 @@ class MaterialRepository:
             conn.close()
 
     def upload_file(self, file_bytes: bytes, filename: str) -> str:
-        # Use Supabase Facade
-        # Generate unique path
+        """
+        Delega la subida de archivos al Facade de Supabase.
+        El repositorio coordina datos (DB) y archivos (Storage).
+        """
         import uuid
+        # Generamos un nombre único para evitar colisiones
         path = f"uploads/{uuid.uuid4()}_{filename}"
-        bucket = "recursos-alojados" # Should be in config
+        bucket = "recursos-alojados" 
         
-        # Upload
+        # Usamos el Facade
         supabase_client.upload_file(bucket, path, file_bytes)
         
-        # Get public URL
+        # Retornamos la URL pública para guardarla en la DB
         return supabase_client.get_public_url(bucket, path)
-

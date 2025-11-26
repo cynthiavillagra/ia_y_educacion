@@ -1,13 +1,28 @@
+
+# -----------------------------------------------------------------------------
+# ARCHIVO LEGACY (OBSOLETO)
+# -----------------------------------------------------------------------------
+# ESTE ARCHIVO YA NO SE USA EN LA NUEVA ARQUITECTURA.
+#
+# Reemplazo:
+# La lógica de ingestión (upload) se ha movido a:
+# -> `repositories/material_repository.py` (Método `create` y `upload_file`)
+# -> `services/material_service.py` (Método `upload_material` con validaciones)
+# -> `server/material_handler.py` (Función `handle_upload_material`)
+#
+# Razón:
+# Separar la validación (Service), la persistencia (Repository) y el manejo HTTP (Handler).
+# Antes este archivo hacía TODO: parsear multipart, validar, subir a Storage y guardar en DB.
+# -----------------------------------------------------------------------------
+
 from http.server import BaseHTTPRequestHandler
 import json
 import sys
 import os
-import uuid
-import requests
 import cgi
 from io import BytesIO
 
-# Add parent directory to path to import utils and auth
+# Add parent directory to path to import utils
 # We are in api/admin, so we need to go up two levels to reach root
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 

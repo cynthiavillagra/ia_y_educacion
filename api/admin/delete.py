@@ -1,15 +1,3 @@
-from http.server import BaseHTTPRequestHandler
-import json
-import sys
-import os
-
-# Add parent directory to path to import utils and auth
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-
-from utils.db_connector import get_connection
-from api.auth import verify_token
-
-
 class handler(BaseHTTPRequestHandler):
     
     def do_DELETE(self):

@@ -1,4 +1,19 @@
 """
+# -----------------------------------------------------------------------------
+# UTILITY: Rate Limiter
+# -----------------------------------------------------------------------------
+# Propósito:
+# Implementar un limitador de tasa simple en memoria para proteger los endpoints
+# de abusos básicos o ataques de denegación de servicio (DoS).
+#
+# Patrón:
+# Token Bucket (simplificado) / Ventana deslizante.
+#
+# Nota:
+# Al ser "in-memory", el estado se pierde si el servidor se reinicia (o en Serverless
+# cuando la instancia se recicla). Para producción distribuida, se usaría Redis.
+# -----------------------------------------------------------------------------
+
 Simple rate limiting for serverless functions
 Uses in-memory storage (resets per cold start, but provides basic protection)
 """

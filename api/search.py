@@ -1,24 +1,22 @@
+# -----------------------------------------------------------------------------
+# ARCHIVO LEGACY (OBSOLETO)
+# -----------------------------------------------------------------------------
+# ESTE ARCHIVO YA NO SE USA EN LA NUEVA ARQUITECTURA.
+#
+# Reemplazo:
+# La lógica de búsqueda se ha movido a:
+# -> `repositories/material_repository.py` (Método `search`)
+# -> `services/material_service.py` (Método `search_materials`)
+# -> `server/material_handler.py` (Función `handle_list_materials`)
+#
+# Razón:
+# Separar la lógica SQL (Repository) de la lógica HTTP (Handler).
+# Antes todo estaba mezclado en este archivo (SQL + HTTP + Lógica).
+# -----------------------------------------------------------------------------
+
 from http.server import BaseHTTPRequestHandler
 import json
 import sys
-import os
-from urllib.parse import parse_qs
-
-# Add parent directory to path to import utils
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-from utils.db_connector import get_connection
-
-class handler(BaseHTTPRequestHandler):
-    
-    def do_GET(self):
-        """Search resources endpoint"""
-        try:
-            # Parse query parameters
-            query_string = self.path.split('?', 1)[1] if '?' in self.path else ''
-            params = parse_qs(query_string)
-            
-            # Extract parameters (parse_qs returns lists, get first item)
             q = params.get("q", [""])[0]
             
             try:

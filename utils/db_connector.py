@@ -1,3 +1,16 @@
+# -----------------------------------------------------------------------------
+# ARCHIVO LEGACY (OBSOLETO)
+# -----------------------------------------------------------------------------
+# ESTE ARCHIVO YA NO SE USA EN LA NUEVA ARQUITECTURA.
+#
+# Reemplazo:
+# La conexión a base de datos se maneja en:
+# -> `utils/db.py`
+#
+# Razón:
+# Estandarización de la conexión y manejo de errores.
+# -----------------------------------------------------------------------------
+
 import os
 import psycopg2
 from psycopg2 import OperationalError
