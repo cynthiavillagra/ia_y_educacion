@@ -1,22 +1,30 @@
-"""
-Admin action logging utility
-Logs all admin actions for auditing purposes
-"""
 import json
 from datetime import datetime
 import os
+
+# -----------------------------------------------------------------------------
+# CAPA: UTILS / LOGGING (Auditoría)
+# -----------------------------------------------------------------------------
+# ¿Por qué?
+# En sistemas críticos, necesitamos saber "quién hizo qué y cuándo".
+# Los logs de consola (print) se pierden. Necesitamos persistencia.
+#
+# ¿Qué logramos?
+# 1. Trazabilidad: Si alguien borra un recurso, sabemos quién fue.
+# 2. Debugging: Si algo falla, tenemos un historial de acciones previas.
+# -----------------------------------------------------------------------------
 
 LOG_FILE = os.path.join(os.path.dirname(__file__), '..', 'admin_actions.log')
 
 def log_admin_action(action: str, user_id: str, resource_id: str = None, details: dict = None):
     """
-    Log an admin action
+    Registra una acción administrativa en un archivo de log (JSON Lines).
     
     Args:
-        action: Action performed (CREATE, UPDATE, DELETE)
-        user_id: ID of the user performing the action
-        resource_id: ID of the affected resource (if applicable)
-        details: Additional details about the action
+        action: Acción realizada (CREATE, UPDATE, DELETE).
+        user_id: ID del usuario que realizó la acción.
+        resource_id: ID del recurso afectado (si aplica).
+        details: Diccionario con detalles adicionales.
     """
     log_entry = {
         'timestamp': datetime.now().isoformat(),
@@ -37,8 +45,8 @@ def log_admin_action(action: str, user_id: str, resource_id: str = None, details
 
 def get_user_id_from_token(headers) -> str:
     """
-    Extract user ID from authorization token
-    For now, returns 'admin' - can be enhanced to decode JWT
+    Extrae el ID de usuario del token (Placeholder).
+    En producción, esto decodificaría el JWT para sacar el 'sub'.
     """
     # TODO: Decode JWT to get actual user ID
     auth_header = headers.get('Authorization', '')

@@ -1,3 +1,12 @@
+# -----------------------------------------------------------------------------
+# [LEGACY] ARCHIVO OBSOLETO
+# -----------------------------------------------------------------------------
+# Este archivo pertenece a la arquitectura anterior.
+# NO USAR en nuevo código.
+#
+# Reemplazo: utils/auth.py
+# -----------------------------------------------------------------------------
+
 import os
 import jwt  # Requiere: pip install PyJWT
 

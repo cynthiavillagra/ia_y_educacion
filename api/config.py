@@ -1,3 +1,12 @@
+# -----------------------------------------------------------------------------
+# [LEGACY] ARCHIVO OBSOLETO
+# -----------------------------------------------------------------------------
+# Este archivo pertenece a la arquitectura anterior.
+# NO USAR en nuevo código.
+#
+# Reemplazo: config/settings.py (y endpoints que lo usen)
+# -----------------------------------------------------------------------------
+
 from http.server import BaseHTTPRequestHandler
 import json
 import os

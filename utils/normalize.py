@@ -1,14 +1,27 @@
 import unicodedata
 
+# -----------------------------------------------------------------------------
+# CAPA: UTILS / NORMALIZATION (Normalización)
+# -----------------------------------------------------------------------------
+# ¿Por qué?
+# Los usuarios escriben "Ética", "etica", "ETICA", " Ética ".
+# Para la búsqueda y el ordenamiento, necesitamos un formato canónico.
+#
+# ¿Qué logramos?
+# 1. Consistencia: Guardamos siempre en minúsculas y sin acentos (para tags).
+# 2. Búsqueda Efectiva: Al buscar "etica" encontramos "Ética".
+# -----------------------------------------------------------------------------
 
 def normalize_tag(text: str) -> str:
     """
-    Normalize a tag by:
-    1. Converting to lowercase
-    2. Removing accents/diacritics
-    3. Stripping whitespace
+    Normaliza una etiqueta (tag) para almacenamiento consistente.
     
-    Examples:
+    Pasos:
+    1. Convertir a minúsculas.
+    2. Eliminar acentos/diacríticos (NFD decomposition).
+    3. Eliminar espacios extra.
+    
+    Ejemplos:
         "Educación" -> "educacion"
         "Ética" -> "etica"
         "IA" -> "ia"
@@ -16,14 +29,14 @@ def normalize_tag(text: str) -> str:
     if not text:
         return ""
     
-    # Convert to lowercase
+    # 1. Convertir a minúsculas
     text = text.lower()
     
-    # Remove accents: NFD decomposition + filter out combining characters
+    # 2. Eliminar acentos: Descomponemos caracteres (á -> a + ´) y filtramos los combinables
     text = unicodedata.normalize('NFD', text)
     text = ''.join(char for char in text if unicodedata.category(char) != 'Mn')
     
-    # Strip whitespace
+    # 3. Eliminar espacios al inicio y final
     text = text.strip()
     
     return text

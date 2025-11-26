@@ -1,3 +1,12 @@
+# -----------------------------------------------------------------------------
+# [LEGACY] ARCHIVO OBSOLETO
+# -----------------------------------------------------------------------------
+# Este archivo pertenece a la arquitectura anterior.
+# NO USAR en nuevo código.
+#
+# Reemplazo: domain/material.py
+# -----------------------------------------------------------------------------
+
 from dataclasses import dataclass, field
 from typing import List, Optional
 

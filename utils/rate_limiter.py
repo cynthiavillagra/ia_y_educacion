@@ -1,24 +1,36 @@
-"""
-Simple rate limiting for serverless functions
-Uses in-memory storage (resets per cold start, but provides basic protection)
-"""
 from datetime import datetime, timedelta
 from typing import Dict, Tuple
 
-# In-memory store (resets on cold start)
+# -----------------------------------------------------------------------------
+# CAPA: UTILS / SECURITY (Rate Limiting)
+# -----------------------------------------------------------------------------
+# ¿Por qué?
+# Las APIs públicas son vulnerables a ataques de denegación de servicio (DoS)
+# o abuso (scraping masivo).
+#
+# ¿Qué logramos?
+# 1. Protección: Limitamos cuántas peticiones puede hacer una IP en un tiempo dado.
+# 2. Estabilidad: Evitamos que un solo usuario sature el servidor.
+#
+# Nota: Esta implementación en memoria se resetea si el servidor reinicia (o en
+# Serverless Functions). Para producción robusta se usa Redis.
+# -----------------------------------------------------------------------------
+
+# Almacén en memoria (Diccionario: IP -> Lista de timestamps)
 _rate_limit_store: Dict[str, list] = {}
 
 def check_rate_limit(ip: str, max_requests: int = 10, window_minutes: int = 1) -> Tuple[bool, int]:
     """
-    Check if IP has exceeded rate limit
+    Verifica si una IP ha excedido el límite de peticiones.
+    Algoritmo: Ventana deslizante simple.
     
     Args:
-        ip: Client IP address
-        max_requests: Maximum requests allowed in window
-        window_minutes: Time window in minutes
+        ip: IP del cliente.
+        max_requests: Máximo de peticiones permitidas en la ventana.
+        window_minutes: Tamaño de la ventana de tiempo en minutos.
         
     Returns:
-        Tuple of (is_allowed, remaining_requests)
+        (is_allowed, remaining_requests)
     """
     now = datetime.now()
     window_start = now - timedelta(minutes=window_minutes)
@@ -27,7 +39,7 @@ def check_rate_limit(ip: str, max_requests: int = 10, window_minutes: int = 1) -
     if ip not in _rate_limit_store:
         _rate_limit_store[ip] = []
     
-    # Remove old requests outside the window
+    # Remove old requests outside the window (Limpieza)
     _rate_limit_store[ip] = [
         req_time for req_time in _rate_limit_store[ip]
         if req_time > window_start
@@ -48,8 +60,8 @@ def check_rate_limit(ip: str, max_requests: int = 10, window_minutes: int = 1) -
 
 def get_client_ip(headers) -> str:
     """
-    Extract client IP from headers
-    Vercel provides this in x-forwarded-for or x-real-ip
+    Extrae la IP real del cliente desde los headers.
+    Soporta proxies (X-Forwarded-For) comunes en Vercel/AWS.
     """
     # Try various headers
     ip = (

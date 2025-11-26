@@ -1,3 +1,12 @@
+# -----------------------------------------------------------------------------
+# [LEGACY] ARCHIVO OBSOLETO
+# -----------------------------------------------------------------------------
+# Este archivo pertenece a la arquitectura anterior.
+# NO USAR en nuevo código.
+#
+# Reemplazo: server/material_handler.py (handle_list_materials con filtros)
+# -----------------------------------------------------------------------------
+
 from http.server import BaseHTTPRequestHandler
 import json
 import sys

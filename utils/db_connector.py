@@ -1,11 +1,18 @@
+# -----------------------------------------------------------------------------
+# [LEGACY] ARCHIVO OBSOLETO
+# -----------------------------------------------------------------------------
+# Este archivo pertenece a la arquitectura anterior.
+# NO USAR en nuevo código.
+#
+# Reemplazo: utils/db.py
+# -----------------------------------------------------------------------------
+
 import os
 import psycopg2
 from psycopg2 import OperationalError
 
 
 def get_connection():
-
-
     raw_host = os.getenv("SUPABASE_DB_HOST")
     host = (raw_host or "").strip().replace("https://", "").replace("http://", "")
     password = os.getenv("SUPABASE_DB_PASSWORD")

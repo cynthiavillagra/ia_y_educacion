@@ -1,3 +1,12 @@
+# -----------------------------------------------------------------------------
+# [LEGACY] ARCHIVO OBSOLETO
+# -----------------------------------------------------------------------------
+# Este archivo pertenece a la arquitectura anterior.
+# NO USAR en nuevo código.
+#
+# Reemplazo: N/A (Usar logs de conexión en utils/db.py)
+# -----------------------------------------------------------------------------
+
 from http.server import BaseHTTPRequestHandler
 import json
 import sys

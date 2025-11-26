@@ -1,19 +1,29 @@
-"""
-Input validation utilities for security
-Validates all user inputs before processing
-"""
 import re
 from datetime import datetime
 from typing import Optional, List
 
+# -----------------------------------------------------------------------------
+# CAPA: UTILS / VALIDATION (Validación)
+# -----------------------------------------------------------------------------
+# ¿Por qué?
+# "Never trust user input" (Nunca confíes en la entrada del usuario).
+# Si dejamos que datos sucios entren al sistema, tendremos errores en la DB,
+# fallos de seguridad (XSS, SQL Injection) o datos inconsistentes.
+#
+# ¿Qué logramos?
+# 1. Seguridad: Filtramos URLs maliciosas, textos demasiado largos, etc.
+# 2. Integridad: Aseguramos que un año sea un número válido, que el estado sea
+#    uno de los permitidos, etc.
+# 3. Centralización: Si cambia la regla de qué es una URL válida, solo tocamos aquí.
+# -----------------------------------------------------------------------------
 
 class ValidationError(Exception):
-    """Custom exception for validation errors"""
+    """Excepción personalizada para errores de validación."""
     pass
 
 
 def validate_year(year: int) -> int:
-    """Validate year is within acceptable range"""
+    """Valida que el año sea razonable (1900 - año actual + 1)."""
     current_year = datetime.now().year
     if not isinstance(year, int):
         raise ValidationError("El año debe ser un número entero")
@@ -23,7 +33,7 @@ def validate_year(year: int) -> int:
 
 
 def validate_url(url: str) -> str:
-    """Validate URL format and allowed protocols"""
+    """Valida formato de URL y protocolos permitidos (http/https)."""
     if not url or not isinstance(url, str):
         raise ValidationError("La URL no puede estar vacía")
     
@@ -50,7 +60,7 @@ def validate_url(url: str) -> str:
 
 
 def validate_tipo_documento(tipo: str) -> str:
-    """Validate document type is one of allowed values"""
+    """Valida que el tipo de documento esté en la lista permitida."""
     allowed_types = ['ARTICULO', 'TESIS', 'LIBRO', 'INFORME', 'OTRO']
     
     if not tipo or not isinstance(tipo, str):
@@ -65,7 +75,7 @@ def validate_tipo_documento(tipo: str) -> str:
 
 
 def validate_estado_alojamiento(estado: str) -> str:
-    """Validate hosting state"""
+    """Valida estado de alojamiento (ORIGINAL vs ALOJADO)."""
     allowed_states = ['ALOJADO', 'ORIGINAL']
     
     if not estado or not isinstance(estado, str):
@@ -80,7 +90,7 @@ def validate_estado_alojamiento(estado: str) -> str:
 
 
 def validate_string_length(value: str, field_name: str, max_length: int, min_length: int = 1) -> str:
-    """Validate string length"""
+    """Valida longitud mínima y máxima de un texto."""
     if not value or not isinstance(value, str):
         raise ValidationError(f"{field_name} no puede estar vacío")
     
@@ -96,7 +106,7 @@ def validate_string_length(value: str, field_name: str, max_length: int, min_len
 
 
 def validate_doi(doi: Optional[str]) -> Optional[str]:
-    """Validate DOI format (optional field)"""
+    """Valida formato DOI (opcional)."""
     if not doi:
         return None
     
@@ -113,7 +123,7 @@ def validate_doi(doi: Optional[str]) -> Optional[str]:
 
 
 def validate_licencia(licencia: str) -> str:
-    """Validate Creative Commons license"""
+    """Valida licencias Creative Commons permitidas."""
     allowed_licenses = [
         'CC BY 4.0',
         'CC BY-SA 4.0',
@@ -136,7 +146,7 @@ def validate_licencia(licencia: str) -> str:
 
 
 def validate_list_not_empty(items: List, field_name: str) -> List:
-    """Validate that a list is not empty"""
+    """Valida que una lista no esté vacía."""
     if not items or not isinstance(items, list) or len(items) == 0:
         raise ValidationError(f"{field_name} debe contener al menos un elemento")
     
@@ -144,7 +154,7 @@ def validate_list_not_empty(items: List, field_name: str) -> List:
 
 
 def sanitize_text(text: str) -> str:
-    """Basic text sanitization - remove potentially dangerous characters"""
+    """Sanitización básica de texto para evitar caracteres peligrosos."""
     if not text:
         return ""
     

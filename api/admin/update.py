@@ -1,3 +1,12 @@
+# -----------------------------------------------------------------------------
+# [LEGACY] ARCHIVO OBSOLETO
+# -----------------------------------------------------------------------------
+# Este archivo pertenece a la arquitectura anterior.
+# NO USAR en nuevo código.
+#
+# Reemplazo: server/material_handler.py (handle_update_material - Pendiente de implementar)
+# -----------------------------------------------------------------------------
+
 from http.server import BaseHTTPRequestHandler
 import json
 import sys

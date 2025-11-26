@@ -1,3 +1,12 @@
+# -----------------------------------------------------------------------------
+# [LEGACY] ARCHIVO OBSOLETO
+# -----------------------------------------------------------------------------
+# Este archivo pertenece a la arquitectura anterior.
+# NO USAR en nuevo código.
+#
+# Reemplazo: repositories/material_repository.py
+# -----------------------------------------------------------------------------
+
 from typing import List, Optional, Tuple
 from utils.db_connector import get_connection
 
