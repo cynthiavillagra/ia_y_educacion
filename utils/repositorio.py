@@ -1,16 +1,3 @@
-# -----------------------------------------------------------------------------
-# ARCHIVO LEGACY (OBSOLETO)
-# -----------------------------------------------------------------------------
-# ESTE ARCHIVO YA NO SE USA EN LA NUEVA ARQUITECTURA.
-#
-# Reemplazo:
-# La lógica de acceso a datos se encuentra en:
-# -> `repositories/material_repository.py`
-#
-# Razón:
-# Implementación del patrón Repository completo con mejor manejo de conexiones y errores.
-# -----------------------------------------------------------------------------
-
 from typing import List, Optional, Tuple
 from utils.db_connector import get_connection
 

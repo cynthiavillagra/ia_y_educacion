@@ -1,20 +1,4 @@
 """
-# -----------------------------------------------------------------------------
-# UTILITY: Validators
-# -----------------------------------------------------------------------------
-# Propósito:
-# Centralizar la lógica de validación de entradas de usuario.
-#
-# Diseño:
-# - Funciones puras que lanzan `ValidationError` si la validación falla.
-# - Utilizado por la capa de Servicio (`services/material_service.py`) antes
-#   de procesar cualquier lógica de negocio.
-#
-# Seguridad:
-# - Validación de tipos, rangos, formatos (Regex) y listas permitidas (Allow-lists).
-# - Sanitización básica de texto.
-# -----------------------------------------------------------------------------
-
 Input validation utilities for security
 Validates all user inputs before processing
 """

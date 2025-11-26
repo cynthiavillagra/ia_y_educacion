@@ -1,16 +1,4 @@
 """
-# -----------------------------------------------------------------------------
-# UTILITY: Logger
-# -----------------------------------------------------------------------------
-# Propósito:
-# Centralizar el registro de acciones administrativas para auditoría.
-#
-# Características:
-# - Escribe en un archivo local (admin_actions.log).
-# - Formato JSON para fácil parsing.
-# - Captura usuario, acción, recurso y timestamp.
-# -----------------------------------------------------------------------------
-
 Admin action logging utility
 Logs all admin actions for auditing purposes
 """

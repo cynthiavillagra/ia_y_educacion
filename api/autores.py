@@ -1,27 +1,13 @@
-# -----------------------------------------------------------------------------
-# ARCHIVO LEGACY (OBSOLETO)
-# -----------------------------------------------------------------------------
-# ESTE ARCHIVO YA NO SE USA EN LA NUEVA ARQUITECTURA.
-#
-# Reemplazo:
-# La lógica de autores se maneja implícitamente al crear/editar materiales en:
-# -> `repositories/material_repository.py` (Método `create` maneja relaciones)
-# -> `services/material_service.py`
-#
-# Razón:
-# Centralizar la lógica de dominio. Los autores son una entidad dependiente
-# de los materiales en este contexto.
-# -----------------------------------------------------------------------------
-
 from http.server import BaseHTTPRequestHandler
 import json
 import sys
 import os
 
-# Add parent directory to path to import utils
+# Add parent directory to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from utils.db_connector import get_connection
+
 
 class handler(BaseHTTPRequestHandler):
     

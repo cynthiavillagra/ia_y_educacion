@@ -1,18 +1,5 @@
 from http.server import BaseHTTPRequestHandler
 import json
-# -----------------------------------------------------------------------------
-# ARCHIVO LEGACY (OBSOLETO)
-# -----------------------------------------------------------------------------
-# ESTE ARCHIVO YA NO SE USA EN LA NUEVA ARQUITECTURA.
-#
-# Reemplazo:
-# La configuración se ha movido a:
-# -> `config/settings.py`
-#
-# Razón:
-# Centralizar variables de entorno y configuración en un módulo dedicado `config/`.
-# -----------------------------------------------------------------------------
-
 import os
 
 class handler(BaseHTTPRequestHandler):
