@@ -1,10 +1,3 @@
-from http.server import BaseHTTPRequestHandler
-from server.material_handler import handle_list_materials
-
-# -----------------------------------------------------------------------------
-# ARCHIVO LEGACY (PROXY)
-# -----------------------------------------------------------------------------
-# Este archivo existe por compatibilidad con Vercel (File-System Routing).
 # Redirige la ejecución al nuevo handler en `server/material_handler.py`.
 # -----------------------------------------------------------------------------
 
