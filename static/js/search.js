@@ -223,8 +223,8 @@ async function search() {
     params.set('orden', state.orden)
 
     // Llamada API
-    // IMPORTANTE: Ahora apunta a /api/search que debe ser manejado por el handler V2 en index.py
-    const res = await fetch(`/api/search?${params.toString()}`)
+    // Usamos la ruta canónica V2
+    const res = await fetch(`/api/material/list?${params.toString()}`)
 
     if (!res.ok) {
       let errorMsg = `Error ${res.status}`
