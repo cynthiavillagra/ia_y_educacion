@@ -1,40 +1,58 @@
 /*
  * REPOSITORIO IA Y EDUCACIÓN
  * Diseño Académico Profesional
- * Paleta: Azul Marino, Gris Neutro, Acento Dorado
+ * Paleta: Púrpura Oscuro, Púrpura Brillante, Negro, Coral, Gris Claro
  */
 
 :root {
-    /* Paleta Primaria - Azul Académico */
-    --primary-50: #f0f4f8;
-    --primary-100: #d9e2ec;
-    --primary-200: #bcccdc;
-    --primary-300: #9fb3c8;
-    --primary-400: #829ab1;
-    --primary-500: #627d98;
-    --primary-600: #486581;
-    --primary-700: #334e68;
-    --primary-800: #243b53;
-    --primary-900: #102a43;
+    /* Paleta Principal */
+    --primary-900: #381C40;
+    /* Púrpura oscuro - principal */
+    --primary-800: #4a2854;
+    --primary-700: #5c3468;
+    --primary-600: #6e407c;
+    --primary-500: #8a5299;
+    --primary-400: #9e6aad;
+    --primary-300: #b382c1;
+    --primary-200: #c79ad5;
+    --primary-100: #dbb2e9;
+    --primary-50: #f0e6f5;
 
-    /* Grises Neutros */
-    --neutral-50: #f9fafb;
-    --neutral-100: #f3f4f6;
-    --neutral-200: #e5e7eb;
-    --neutral-300: #d1d5db;
-    --neutral-400: #9ca3af;
-    --neutral-500: #6b7280;
-    --neutral-600: #4b5563;
-    --neutral-700: #374151;
-    --neutral-800: #1f2937;
-    --neutral-900: #111827;
+    /* Acento Púrpura Brillante */
+    --accent-purple: #B150F2;
+    --accent-purple-light: #c77ff5;
+    --accent-purple-dark: #9340d0;
 
-    /* Acentos */
-    --accent-gold: #b8860b;
-    --accent-gold-light: #daa520;
-    --accent-green: #047857;
-    --accent-green-light: #10b981;
-    --accent-red: #dc2626;
+    /* Negro/Oscuro */
+    --dark-900: #111826;
+    --dark-800: #1a2332;
+    --dark-700: #232e3e;
+    --dark-600: #2c394a;
+    --dark-500: #354456;
+
+    /* Acento Coral/Rojo */
+    --accent-coral: #F24949;
+    --accent-coral-light: #f56d6d;
+    --accent-coral-dark: #d93636;
+
+    /* Neutros */
+    --neutral-50: #F2F2F2;
+    /* Gris muy claro - fondos */
+    --neutral-100: #e8e8e8;
+    --neutral-200: #d4d4d4;
+    --neutral-300: #b8b8b8;
+    --neutral-400: #9c9c9c;
+    --neutral-500: #737373;
+    --neutral-600: #525252;
+    --neutral-700: #404040;
+    --neutral-800: #262626;
+    --neutral-900: #171717;
+
+    /* Colores Semánticos */
+    --success: #10b981;
+    --warning: #f59e0b;
+    --error: #F24949;
+    --info: #B150F2;
 
     /* Tipografía Profesional */
     --font-heading: 'Palatino Linotype', 'Book Antiqua', Palatino, Georgia, serif;
@@ -168,7 +186,7 @@ p {
 }
 
 .logo-icon {
-    background: var(--accent-gold);
+    background: var(--accent-purple);
     color: var(--primary-900);
     width: 40px;
     height: 40px;
@@ -480,7 +498,7 @@ p {
 
 .article-meta {
     font-size: 0.875rem;
-    color: var(--accent-green);
+    color: var(--success);
     margin-bottom: var(--space-3);
     font-weight: 500;
 }
@@ -737,7 +755,7 @@ p {
 
 .authors-list li {
     padding: var(--space-1) 0;
-    color: var(--accent-green);
+    color: var(--success);
     font-weight: 500;
 }
 
@@ -831,7 +849,7 @@ p {
 }
 
 .btn-danger {
-    background: var(--accent-red);
+    background: var(--accent-coral);
     color: white;
 }
 
@@ -871,7 +889,7 @@ p {
 .admin-section h4 {
     font-size: 0.75rem;
     text-transform: uppercase;
-    color: var(--accent-red);
+    color: var(--accent-coral);
     margin-bottom: var(--space-3);
 }
 
