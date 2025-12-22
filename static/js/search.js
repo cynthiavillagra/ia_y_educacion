@@ -14,7 +14,7 @@ function paramsToState() {
   $('#q').value = p.get('q') || ''
   $('#autor').value = p.get('autor') || ''
   $('#anio').value = p.get('anio') || ''
-  $('#coleccion').value = p.get('coleccion') || ''
+  $('#fuente').value = p.get('fuente') || ''
   $('#tipo').value = p.get('tipo') || ''
   state.page = parseInt(p.get('page') || '1', 10)
   state.orden = p.get('orden') || 'relevancia'
@@ -25,8 +25,13 @@ function stateToParams() {
   const url = new URL(location.href)
   const p = url.searchParams
   p.set('page', String(state.page))
+  // Mapear orden frontend -> backend v2
+  // 'fecha_ingreso' ahora es 'fecha_incorporacion_repo' en DB, pero el handler puede manejar alias o usamos el nombre nuevo en el select.
+  // El handler ya usa el valor directamente, así que aseguramos que el HTML tenga los values correctos o el handler haga el map.
+  // Por ahora mantenemos los valores del select HTML ('relevancia', 'anio_desc', 'fecha_ingreso_desc')
+  // y dejamos que el backend decida si necesita adaptación.
   p.set('orden', state.orden)
-  const map = { q: '#q', autor: '#autor', anio: '#anio', coleccion: '#coleccion', tipo: '#tipo' }
+  const map = { q: '#q', autor: '#autor', anio: '#anio', fuente: '#fuente', tipo: '#tipo' }
   Object.entries(map).forEach(([k, sel]) => {
     const v = $(sel).value.trim()
     if (v) p.set(k, v); else p.delete(k)
@@ -59,22 +64,32 @@ function renderPagination(total, page, perPage) {
 }
 
 function cardTemplate(item) {
-  const autores = (item.autores || []).join('; ')
-  const resumen = (item.resumen || '').slice(0, 160)
+  // Backend v2 devuelve strings separados por ; o ,
+  // Backend v1 devolvía arrays. Normalizamos a array para visualización consistente.
+  let autores = []
+  if (Array.isArray(item.autores)) autores = item.autores
+  else if (typeof item.autores === 'string') autores = item.autores.split(';').map(s => s.trim()).filter(Boolean)
+
+  let etiquetas = []
+  if (Array.isArray(item.etiquetas)) etiquetas = item.etiquetas
+  else if (typeof item.etiquetas === 'string') etiquetas = item.etiquetas.split(',').map(s => s.trim()).filter(Boolean)
+
+  const resumen = (item.descripcion_resumen || item.resumen || '').slice(0, 160)
+
   return `
     <a class="card hover:shadow-sm transition flex flex-col h-full p-4 border rounded-lg bg-white" href="./detalle.html?id=${encodeURIComponent(item.id)}">
       <h3 class="card-title text-lg font-semibold mb-2 text-gray-900">${item.titulo || ''}</h3>
-      <div class="text-xs font-medium text-indigo-600 mb-1 uppercase tracking-wide">${item.coleccion || ''}</div>
-      <p class="card-meta text-sm text-gray-600 mb-2">${autores}</p>
-      <p class="text-sm text-gray-700 mb-3 flex-grow">${resumen}${item.resumen && item.resumen.length > 160 ? '…' : ''}</p>
+      <div class="text-xs font-medium text-indigo-600 mb-1 uppercase tracking-wide">${item.institucion_fuente || item.coleccion || ''}</div>
+      <p class="card-meta text-sm text-gray-600 mb-2">${autores.join('; ')}</p>
+      <p class="text-sm text-gray-700 mb-3 flex-grow">${resumen}${(item.descripcion_resumen || item.resumen || '').length > 160 ? '…' : ''}</p>
       
       <div class="mb-3 flex flex-wrap gap-1">
-        ${(item.etiquetas || []).slice(0, 3).map(t => `<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800">${t}</span>`).join('')}
+        ${etiquetas.slice(0, 3).map(t => `<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800">${t}</span>`).join('')}
       </div>
 
       <div class="mt-auto flex items-center justify-between text-sm text-gray-500 pt-2 border-t">
-        <span>${item.año_publicacion || ''}</span>
-        <span class="px-2 py-1 rounded bg-indigo-50 text-indigo-700 text-xs font-medium">${item.tipo_documento || ''}</span>
+        <span>${item.anio_publicacion || ''}</span>
+        <span class="px-2 py-1 rounded bg-indigo-50 text-indigo-700 text-xs font-medium">${item.tipo_recurso || item.tipo_documento || ''}</span>
       </div>
     </a>
   `
@@ -87,7 +102,7 @@ async function search() {
   const q = $('#q').value.trim(); if (q) params.set('q', q)
   const autor = $('#autor').value.trim(); if (autor) params.set('autor', autor)
   const anio = $('#anio').value.trim(); if (anio) params.set('anio', anio)
-  const coleccion = $('#coleccion').value.trim(); if (coleccion) params.set('coleccion', coleccion)
+  const fuente = $('#fuente').value.trim(); if (fuente) params.set('fuente', fuente)
   const tipo = $('#tipo').value.trim(); if (tipo) params.set('tipo', tipo)
   params.set('page', String(state.page))
   params.set('per_page', String(state.perPage))
@@ -99,8 +114,9 @@ async function search() {
     return
   }
   const data = await res.json()
-  const items = data.items || data.resultados || []
-  state.total = data.total || 0
+  // Soporte para estructura { total, items } o lista directa (legacy)
+  const items = Array.isArray(data) ? data : (data.items || data.resultados || [])
+  state.total = typeof data.total === 'number' ? data.total : items.length
   $('#results-count').textContent = `${state.total} resultados`
   $('#results').innerHTML = items.map(cardTemplate).join('')
   renderPagination(state.total, state.page, state.perPage)

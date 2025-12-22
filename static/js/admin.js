@@ -30,65 +30,32 @@ async function handleLoginInit() {
 }
 
 function toggleOrigenFields() {
-  const sel = document.getElementById('estado_alojamiento')
-  const alojado = document.getElementById('group-alojado')
-  const original = document.getElementById('group-original')
-  const v = sel.value
-  alojado.classList.toggle('hidden', v !== 'ALOJADO')
-  original.classList.toggle('hidden', v !== 'ORIGINAL')
-}
+  const sel = document.getElementById('archivo_local')
+  const localGroup = document.getElementById('group-local')
+  const urlGroup = document.getElementById('group-url')
 
-async function requireAuthOrRedirect() {
-  const form = document.getElementById('ingestion-form') || document.getElementById('edicion-form')
-  if (!form) return
-  const token = getToken()
-  if (!token) { location.href = '/admin/login.html'; return }
-}
+  // value viene como string "true"/"false" del select
+  const isLocal = sel.value === 'true'
 
-async function loadTags() {
-  try {
-    const res = await fetch('/api/etiquetas')
-    if (!res.ok) return
-    const tags = await res.json()
-
-    // Initialize etiquetas autocomplete
-    if (window.etiquetasAutocomplete) {
-      window.etiquetasAutocomplete.setSuggestions(tags)
-    }
-  } catch (e) {
-    console.error('Error loading tags:', e)
-  }
-}
-
-async function loadAuthors() {
-  try {
-    const res = await fetch('/api/autores')
-    if (!res.ok) return
-    const authors = await res.json()
-
-    // Initialize autores autocomplete
-    if (window.autoresAutocomplete) {
-      window.autoresAutocomplete.setSuggestions(authors)
-    }
-  } catch (e) {
-    console.error('Error loading authors:', e)
-  }
-}
-
-function setupAutocomplete() {
-  // Create autocomplete instances
-  if (document.getElementById('etiquetas') && window.MultiAutocomplete) {
-    window.etiquetasAutocomplete = new window.MultiAutocomplete('etiquetas', 'etiquetas-dropdown', [], ',')
-  }
-  if (document.getElementById('autores') && window.MultiAutocomplete) {
-    window.autoresAutocomplete = new window.MultiAutocomplete('autores', 'autores-dropdown', [], ';')
+  if (isLocal) {
+    localGroup.classList.remove('hidden')
+    // urlGroup.classList.add('hidden') // Opcional: ¿queremos ocultar la URL externa si sube archivo? V2 permite ambas.
+    // Dejemos visible la URL siempre, ya que es "url_fuente_original" (obligatoria en DB, o recomendada).
+    // Si la DB dice url_fuente_original NOT NULL, hay que pedirla siempre.
+    // Pero si archivo_local=true, quizás la URL sea la del archivo.
+    // El backend se encarga de rellenar url_fuente si falta.
+    // Mostrémosla siempre por claridad.
+  } else {
+    localGroup.classList.add('hidden')
+    // urlGroup.classList.remove('hidden')
   }
 }
 
 async function handleIngestionInit() {
   const form = document.getElementById('ingestion-form')
   if (!form) return
-  const selOrigen = document.getElementById('estado_alojamiento')
+
+  const selOrigen = document.getElementById('archivo_local')
   toggleOrigenFields()
   selOrigen.addEventListener('change', toggleOrigenFields)
 
@@ -102,18 +69,36 @@ async function handleIngestionInit() {
     e.preventDefault()
     const status = document.getElementById('ingestion-status')
     status.textContent = 'Guardando…'
+
+    // Preparar FormData
     const fd = new FormData(form)
-    const autores = (document.getElementById('autores').value || '').split(';').map(s => s.trim()).filter(Boolean)
-    const etiquetas = (document.getElementById('etiquetas').value || '').split(',').map(s => s.trim()).filter(Boolean)
-    fd.set('autores', JSON.stringify(autores))
-    fd.set('etiquetas', JSON.stringify(etiquetas))
+
+    // Autores y Etiquetas: obtener string directo del input.
+    // El backend v2 espera texto (ej: "Autor1; Autor2").
+    // Los inputs ya tienen ese texto si el usuario usó el autocomplete o escribió.
+    // Aseguramos que se envía lo que hay en el input.
+    const autores = document.getElementById('autores').value
+    const palabras_clave = document.getElementById('etiquetas').value // el input se llama 'etiquetas' en HTML pero name='palabras_clave'
+
+    // Si el name del input es 'palabras_clave', FormData ya lo tiene.
+    // Pero chequeamos si el input name="etiquetas" o "palabras_clave" en HTML nuevo.
+    // En HTML nuevo puse name="palabras_clave" para etiquetas.
+    // name="autores" para autores.
+    // Así que FormData ya captura los valores correctos.
+    // No hace falta setearlos manual si el name coincide.
 
     const res = await fetch('/api/admin/ingestion', {
       method: 'POST',
       headers: { 'Authorization': `Bearer ${getToken()}` },
       body: fd
     })
-    if (!res.ok) { status.textContent = 'Error al guardar'; return }
+
+    if (!res.ok) {
+      const err = await res.json()
+      status.textContent = 'Error al guardar: ' + (err.error || err.detail || 'Desconocido')
+      return
+    }
+
     status.textContent = 'Guardado correctamente'
     form.reset()
     toggleOrigenFields()
@@ -138,27 +123,37 @@ async function handleEditionInit() {
     if (!res.ok) throw new Error('Error al cargar recurso')
     const r = await res.json()
 
-    document.getElementById('recurso_id').value = r.id
-    document.getElementById('titulo').value = r.titulo || ''
-    document.getElementById('codigo_documento').value = r.codigo_documento || ''
-    document.getElementById('anio').value = r.año_publicacion || ''
-    document.getElementById('coleccion').value = r.coleccion || ''
-    document.getElementById('resumen').value = r.resumen || ''
-    document.getElementById('autores').value = (r.autores || []).join('; ')
-    document.getElementById('etiquetas').value = (r.etiquetas || []).join(', ')
-    document.getElementById('tipo_documento').value = r.tipo_documento || 'ARTICULO'
-    document.getElementById('estado_alojamiento').value = r.estado_alojamiento || 'ORIGINAL'
-    document.getElementById('licencia_cc').value = r.licencia_cc || 'CC BY 4.0'
-    document.getElementById('url_descarga').value = r.url_descarga || ''
+    // Map fields v2
+    // Hidden ID field
+    if (document.getElementById('recurso_id')) document.getElementById('recurso_id').value = r.id
+
+    const setVal = (id, val) => { if ($(id)) $(id).value = val || '' }
+
+    setVal('#titulo', r.titulo)
+    setVal('#titulo_original', r.titulo_original)
+    setVal('#doi', r.doi)
+    setVal('#isbn_issn', r.isbn_issn)
+    setVal('#anio', r.anio_publicacion)
+
+    setVal('#institucion_fuente', r.institucion_fuente)
+    setVal('#institucion_autora', r.institucion_autora)
+
+    setVal('#resumen', r.descripcion_resumen)
+    setVal('#autores', r.autores) // string
+    setVal('#etiquetas', r.palabras_clave) // string
+
+    setVal('#tipo_recurso', r.tipo_recurso || 'paper_academico')
+    setVal('#archivo_local', r.archivo_local ? 'true' : 'false')
+    setVal('#licencia', r.licencia)
+    setVal('#url_fuente_original', r.url_fuente_original)
 
     toggleOrigenFields()
   } catch (e) {
     console.error('Error al cargar datos del recurso:', e)
-    // Don't show alert, data might still load partially
   }
 
-  const selOrigen = document.getElementById('estado_alojamiento')
-  selOrigen.addEventListener('change', toggleOrigenFields)
+  const selOrigen = document.getElementById('archivo_local')
+  if (selOrigen) selOrigen.addEventListener('change', toggleOrigenFields)
 
   document.getElementById('logout').addEventListener('click', async () => {
     await supabase.auth.signOut()
@@ -170,17 +165,17 @@ async function handleEditionInit() {
     e.preventDefault()
     const status = document.getElementById('edicion-status')
     status.textContent = 'Guardando cambios…'
+
     const fd = new FormData(form)
-    const autores = (document.getElementById('autores').value || '').split(';').map(s => s.trim()).filter(Boolean)
-    const etiquetas = (document.getElementById('etiquetas').value || '').split(',').map(s => s.trim()).filter(Boolean)
-    fd.set('autores', JSON.stringify(autores))
-    fd.set('etiquetas', JSON.stringify(etiquetas))
+    // Agregar ID explícitamente si no está en form
+    fd.append('id', id)
 
     const res = await fetch('/api/admin/update', {
       method: 'POST',
       headers: { 'Authorization': `Bearer ${getToken()}` },
       body: fd
     })
+
     if (!res.ok) {
       const err = await res.json()
       status.textContent = 'Error al guardar: ' + (err.error || 'Desconocido')
@@ -188,7 +183,7 @@ async function handleEditionInit() {
     }
     status.textContent = 'Cambios guardados correctamente'
     setTimeout(() => {
-      location.href = `/public/detalle.html?id=${id}`
+      location.href = `/detalle.html?id=${id}` // Ajuste de path relativo
     }, 1000)
   })
 }

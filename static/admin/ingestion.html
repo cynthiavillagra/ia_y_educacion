@@ -41,25 +41,47 @@
             class="w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 transition-colors">
         </div>
         <div class="space-y-1">
-          <label class="block text-sm font-semibold text-gray-700" for="codigo_documento">Código (DOI/ISBN)</label>
-          <input id="codigo_documento" name="codigo_documento" type="text"
+          <label class="block text-sm font-semibold text-gray-700" for="titulo_original">Título Original
+            (opcional)</label>
+          <input id="titulo_original" name="titulo_original" type="text"
+            class="w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 transition-colors">
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="space-y-1">
+          <label class="block text-sm font-semibold text-gray-700" for="doi">DOI</label>
+          <input id="doi" name="doi" type="text" placeholder="10.xxxx/..."
+            class="w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 transition-colors">
+        </div>
+        <div class="space-y-1">
+          <label class="block text-sm font-semibold text-gray-700" for="isbn_issn">ISBN / ISSN</label>
+          <input id="isbn_issn" name="isbn_issn" type="text"
             class="w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 transition-colors">
         </div>
         <div class="space-y-1">
           <label class="block text-sm font-semibold text-gray-700" for="anio">Año de publicación</label>
-          <input id="anio" name="año_publicacion" type="number" min="1900" max="2100" required
+          <input id="anio" name="anio_publicacion" type="number" min="1900" max="2100"
+            class="w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 transition-colors">
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="space-y-1">
+          <label class="block text-sm font-semibold text-gray-700" for="institucion_fuente">Institución Fuente</label>
+          <input id="institucion_fuente" name="institucion_fuente" type="text" required
             class="w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 transition-colors">
         </div>
         <div class="space-y-1">
-          <label class="block text-sm font-semibold text-gray-700" for="coleccion">Colección</label>
-          <input id="coleccion" name="coleccion" type="text" required
+          <label class="block text-sm font-semibold text-gray-700" for="institucion_autora">Institución Autora</label>
+          <input id="institucion_autora" name="institucion_autora" type="text"
             class="w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 transition-colors">
         </div>
       </div>
 
       <div class="space-y-1">
-        <label class="block text-sm font-semibold text-gray-700" for="resumen">Resumen</label>
-        <textarea id="resumen" name="resumen" rows="4"
+        <label class="block text-sm font-semibold text-gray-700" for="resumen">Descripción / Resumen</label>
+        <textarea id="resumen" name="descripcion_resumen" rows="4"
           class="w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 transition-colors"></textarea>
       </div>
 
@@ -67,46 +89,54 @@
         <div class="space-y-1">
           <label class="block text-sm font-semibold text-gray-700" for="autores">Autores</label>
           <div class="autocomplete-container">
-            <input id="autores" name="autores" type="text" placeholder="Apellido, Nombre; Otro Autor" required
+            <input id="autores" name="autores" type="text" placeholder="Apellido, Nombre; Otro Autor"
               class="w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 transition-colors">
             <div id="autores-dropdown" class="autocomplete-dropdown"></div>
           </div>
-          <p class="text-xs text-gray-500">Separados por punto y coma (;). Escribe para ver sugerencias.</p>
+          <p class="text-xs text-gray-500">Separados por punto y coma (;).</p>
         </div>
         <div class="space-y-1">
-          <label class="block text-sm font-semibold text-gray-700" for="etiquetas">Etiquetas</label>
+          <label class="block text-sm font-semibold text-gray-700" for="etiquetas">Palabras Clave</label>
           <div class="autocomplete-container">
-            <input id="etiquetas" name="etiquetas" type="text" placeholder="ética, IA, educación"
+            <input id="etiquetas" name="palabras_clave" type="text" placeholder="ética, IA, educación"
               class="w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 transition-colors">
             <div id="etiquetas-dropdown" class="autocomplete-dropdown"></div>
           </div>
-          <p class="text-xs text-gray-500">Separadas por coma (,). Escribe para ver sugerencias.</p>
+          <p class="text-xs text-gray-500">Separadas por coma (,).</p>
         </div>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div class="space-y-1">
-          <label class="block text-sm font-semibold text-gray-700" for="tipo_documento">Tipo</label>
-          <select id="tipo_documento" name="tipo_documento" required
+          <label class="block text-sm font-semibold text-gray-700" for="tipo_recurso">Tipo de Recurso</label>
+          <select id="tipo_recurso" name="tipo_recurso" required
             class="w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 transition-colors">
-            <option value="ARTICULO">Artículo</option>
-            <option value="TESIS">Tesis</option>
-            <option value="LIBRO">Libro</option>
-            <option value="INFORME">Informe</option>
-            <option value="OTRO">Otro</option>
+            <option value="paper_academico">Paper Académico</option>
+            <option value="libro">Libro</option>
+            <option value="capitulo_libro">Capítulo de Libro</option>
+            <option value="informe">Informe</option>
+            <option value="guia">Guía</option>
+            <option value="normativa">Normativa</option>
+            <option value="diseno_curricular">Diseño Curricular</option>
+            <option value="articulo_web">Artículo Web</option>
+            <option value="web_institucional">Web Institucional</option>
+            <option value="material_docente">Material Docente</option>
+            <option value="boletin">Boletín</option>
+            <option value="dataset">Dataset</option>
+            <option value="presentacion">Presentación</option>
           </select>
         </div>
         <div class="space-y-1">
-          <label class="block text-sm font-semibold text-gray-700" for="estado_alojamiento">Origen</label>
-          <select id="estado_alojamiento" name="estado_alojamiento" required
+          <label class="block text-sm font-semibold text-gray-700" for="archivo_local">¿Alojamiento Local?</label>
+          <select id="archivo_local" name="archivo_local" required
             class="w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 transition-colors">
-            <option value="ALOJADO">Alojado</option>
-            <option value="ORIGINAL">Original</option>
+            <option value="false">No (Solo Link Externo)</option>
+            <option value="true">Sí (Subir Archivo)</option>
           </select>
         </div>
         <div class="space-y-1">
-          <label class="block text-sm font-semibold text-gray-700" for="licencia_cc">Licencia</label>
-          <select id="licencia_cc" name="licencia_cc" required
+          <label class="block text-sm font-semibold text-gray-700" for="licencia">Licencia</label>
+          <select id="licencia" name="licencia" required
             class="w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 transition-colors">
             <option value="CC BY 4.0">CC BY 4.0</option>
             <option value="CC BY-SA 4.0">CC BY-SA 4.0</option>
@@ -115,20 +145,23 @@
             <option value="CC BY-NC-SA 4.0">CC BY-NC-SA 4.0</option>
             <option value="CC BY-NC-ND 4.0">CC BY-NC-ND 4.0</option>
             <option value="CC0 1.0">CC0 1.0</option>
+            <option value="Copyright">Copyright</option>
+            <option value="Otra">Otra</option>
           </select>
         </div>
       </div>
 
-      <div id="group-alojado" class="hidden p-4 bg-gray-50 rounded-lg border border-gray-200">
-        <label class="block text-sm font-semibold text-gray-700 mb-2" for="archivo">Archivo</label>
+      <div id="group-local" class="hidden p-4 bg-gray-50 rounded-lg border border-gray-200">
+        <label class="block text-sm font-semibold text-gray-700 mb-2" for="archivo">Archivo PDF/DOCX</label>
         <input id="archivo" name="archivo" type="file" accept=".pdf,.doc,.docx"
           class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
-        <p class="text-xs text-gray-500 mt-2">Formatos: PDF, DOCX. Máx 10 MB.</p>
+        <p class="text-xs text-gray-500 mt-2">Se alojará en Supabase Storage.</p>
       </div>
 
-      <div id="group-original" class="hidden">
-        <label class="block text-sm font-semibold text-gray-700 mb-1" for="url_descarga">URL externa</label>
-        <input id="url_descarga" name="url_descarga" type="url" placeholder="https://..."
+      <div id="group-url">
+        <label class="block text-sm font-semibold text-gray-700 mb-1" for="url_fuente_original">URL Fuente
+          Original</label>
+        <input id="url_fuente_original" name="url_fuente_original" type="url" placeholder="https://..."
           class="w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 transition-colors">
       </div>
 

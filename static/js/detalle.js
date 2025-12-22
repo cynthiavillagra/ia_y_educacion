@@ -22,13 +22,17 @@ async function loadDetalle() {
   if (!res.ok) return
   const r = await res.json()
 
-  $('#breadcrumb-title').textContent = r.titulo || 'Detalle'
-  $('#titulo').textContent = r.titulo || ''
-  $('#anio').textContent = r.año_publicacion || ''
-  $('#tipo').textContent = r.tipo_documento || ''
-  $('#coleccion').textContent = r.coleccion || ''
+  const titulo = r.titulo || r.titulo_original || 'Sin título'
+  $('#breadcrumb-title').textContent = titulo
+  $('#titulo').textContent = titulo
+  $('#anio').textContent = r.anio_publicacion || r.año_publicacion || ''
+  $('#tipo').textContent = r.tipo_recurso || r.tipo_documento || ''
+  $('#coleccion').textContent = r.institucion_fuente || r.coleccion || ''
 
-  const autores = r.autores || []
+  let autores = []
+  if (Array.isArray(r.autores)) autores = r.autores
+  else if (typeof r.autores === 'string') autores = r.autores.split(';').map(s => s.trim()).filter(Boolean)
+
   if (autores.length > 0) {
     $('#autores').innerHTML = autores.map(a => `<li>${a}</li>`).join('')
     $('#autores').parentElement.style.display = 'block'
@@ -36,14 +40,21 @@ async function loadDetalle() {
     $('#autores').parentElement.style.display = 'none'
   }
 
-  if (r.resumen) {
-    $('#resumen').textContent = r.resumen
+  const resumen = r.descripcion_resumen || r.resumen
+  if (resumen) {
+    $('#resumen').textContent = resumen
     $('#resumen').parentElement.style.display = 'block'
   } else {
     $('#resumen').parentElement.style.display = 'none'
   }
 
-  const tags = r.etiquetas || []
+  let tags = []
+  if (Array.isArray(r.etiquetas) || Array.isArray(r.palabras_clave)) tags = r.etiquetas || r.palabras_clave
+  else {
+    const rawTags = r.palabras_clave || r.etiquetas
+    if (typeof rawTags === 'string') tags = rawTags.split(',').map(s => s.trim()).filter(Boolean)
+  }
+
   if (tags.length > 0) {
     $('#etiquetas').innerHTML = tags.map(t => `<span class="badge badge-gray">${t}</span>`).join('')
     $('#etiquetas').parentElement.style.display = 'block'
@@ -55,34 +66,42 @@ async function loadDetalle() {
   $('#licencia_texto').textContent = r.licencia_cc || ''
 
   const btn = $('#btn_acceso')
-  if (r.estado_alojamiento === 'ALOJADO') {
+  // v2 usa archivo_local (bool) y url_fuente_original / url_archivo_local
+  // v1 usaba estado_alojamiento === 'ALOJADO'
+  const isHosted = r.archivo_local === true || r.estado_alojamiento === 'ALOJADO'
+  const downloadUrl = r.url_archivo_local || r.url_directa_pdf || r.url_descarga
+  const viewUrl = r.url_fuente_original || r.url_descarga
+
+  if (isHosted && downloadUrl) {
     btn.textContent = '📥 Descargar documento'
-    btn.href = r.url_descarga
+    btn.href = downloadUrl
     btn.title = 'Descargar el archivo PDF'
   } else {
     btn.textContent = '🔗 Ver documento original'
-    btn.href = r.url_descarga
-    btn.title = r.url_descarga || 'Ver en sitio original'
+    btn.href = viewUrl || '#'
+    btn.title = viewUrl || 'Ver en sitio original'
 
     // Add URL below the button
     const urlDisplay = document.createElement('a')
-    urlDisplay.href = r.url_descarga
+    urlDisplay.href = viewUrl || '#'
     urlDisplay.target = '_blank'
     urlDisplay.rel = 'noopener'
-    urlDisplay.textContent = r.url_descarga
+    urlDisplay.textContent = viewUrl || ''
     urlDisplay.className = 'text-xs text-gray-500 hover:text-indigo-600 break-all block mt-2'
     btn.parentElement.appendChild(urlDisplay)
   }
 
-  if (r.codigo_documento) {
-    $('#codigo_documento').textContent = r.codigo_documento
+  const codigo = r.doi || r.isbn_issn || r.codigo_documento
+  if (codigo) {
+    $('#codigo_documento').textContent = codigo
     $('#codigo_documento').parentElement.style.display = 'block'
   } else {
     $('#codigo_documento').parentElement.style.display = 'none'
   }
 
-  if (r.fecha_ingreso) {
-    $('#fecha_ingreso').textContent = new Date(r.fecha_ingreso).toLocaleString()
+  const fecha = r.fecha_incorporacion_repo || r.fecha_ingreso
+  if (fecha) {
+    $('#fecha_ingreso').textContent = new Date(fecha).toLocaleDateString()
   }
 
   // Check admin auth

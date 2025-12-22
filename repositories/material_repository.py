@@ -107,7 +107,7 @@ class MaterialRepository:
                 if order == "anio_asc":
                     order_sql = "r.anio_publicacion ASC"
                 elif order == "anio_desc":
-                    order_sql = "r.año_publicacion DESC" # Ojo con el nombre de col si cambia en DB
+                    order_sql = "r.anio_publicacion DESC" # Corregido ñ -> ni
                 elif order == "recientes":
                     order_sql = "r.fecha_incorporacion_repo DESC"
                 else:
@@ -138,11 +138,11 @@ class MaterialRepository:
                         "titulo": r[1], 
                         "anio_publicacion": r[2], 
                         "score": float(r[3]),
-                        "resumen": r[4],
+                        "descripcion_resumen": r[4], # Alineado con frontend
                         "tipo_recurso": r[5],
-                        "autores": r[6], # Ya viene como string plano
-                        "etiquetas": r[7], # Ya viene como string plano
-                        "institucion": r[8]
+                        "autores": r[6], 
+                        "etiquetas": r[7], 
+                        "institucion_fuente": r[8] # Alineado con frontend
                     }
                     for r in rows
                 ]
