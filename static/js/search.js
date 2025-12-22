@@ -222,9 +222,8 @@ async function search() {
     params.set('per_page', state.perPage)
     params.set('orden', state.orden)
 
-    // Llamada API
-    // Usamos la ruta canónica V2
-    const res = await fetch(`/api/material/list?${params.toString()}`)
+    // Llamada API - Usa ruta Flask directa
+    const res = await fetch(`/api/search?${params.toString()}`)
 
     if (!res.ok) {
       let errorMsg = `Error ${res.status}`
