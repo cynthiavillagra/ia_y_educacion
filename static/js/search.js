@@ -128,7 +128,15 @@ async function search() {
 
   const res = await fetch(`/api/search?${params.toString()}`)
   if (!res.ok) {
-    $('#results-count').textContent = 'Error al buscar'
+    let msg = 'Error al buscar'
+    try {
+      const errData = await res.json()
+      msg = errData.error || errData.detail || msg
+    } catch (e) {
+      try { msg = await res.text() } catch (e2) { }
+    }
+    console.error('API Error:', msg)
+    $('#results-count').innerHTML = `<span class="text-red-600">Error: ${msg.slice(0, 100)}</span>`
     return
   }
   const data = await res.json()
