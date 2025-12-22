@@ -356,14 +356,16 @@ sequenceDiagram
 
 ## Archivos Legacy
 
-El proyecto evolucionó de una arquitectura anterior. Los siguientes archivos están marcados como **LEGACY** y no deben usarse:
+El proyecto evolucionó de una arquitectura anterior. Los siguientes archivos están marcados como **LEGACY** y fueron eliminados:
 
-| Archivo Legacy | Reemplazo Actual |
-|----------------|------------------|
-| `api/search.py` | `server/material_handler.py::handle_list_materials` |
-| `api/admin/ingestion.py` | `server/material_handler.py::handle_upload_material` |
+| Archivo Legacy | Estado |
+|----------------|--------|
+| `api/search.py` (antiguo) | ❌ ELIMINADO - Reemplazado por Flask |
+| `api/recurso_detalle.py` | ❌ ELIMINADO |
+| `api/autores.py` | ❌ ELIMINADO |
+| `api/etiquetas.py` | ❌ ELIMINADO |
 
-> ⚠️ **Nota**: Estos archivos se mantienen temporalmente para compatibilidad con el frontend anterior, pero toda nueva funcionalidad debe usar la arquitectura nueva.
+> ✅ **Actual**: Todo el backend ahora corre en `api/index.py` (Flask autocontenido).
 
 ## Configuración
 
@@ -375,10 +377,14 @@ El proyecto evolucionó de una arquitectura anterior. Los siguientes archivos es
 
 ## Punto de Entrada
 
-**Desarrollo Local**: `app.py`
-- Registra todas las rutas
-- Inicia el servidor HTTP
-- Compatible con Vercel mediante `api/index.py`
+### Producción (Vercel): `api/index.py`
+- Aplicación Flask autocontenida
+- Define todas las rutas (`/api/search`, `/api/recurso_detalle`, etc.)
+- No depende de imports internos para máxima estabilidad
+
+### Desarrollo Local: `app.py`
+- Registra rutas usando el Router interno
+- Opcional: puede usarse Flask local también
 
 ## Estructura de Directorios
 

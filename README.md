@@ -46,12 +46,13 @@ El proyecto sigue una **arquitectura de Monolito Modular en Capas** con **7 patr
 
 ## 🚀 Tecnologías
 
-- **Backend**: Python 3.11+ (Serverless en Vercel)
-- **Base de Datos**: PostgreSQL 15 (Supabase)
+- **Backend**: Python 3.11+ con **Flask 3.0** (Serverless en Vercel)
+- **Base de Datos**: PostgreSQL 15 (Supabase) con Full-Text Search
 - **Autenticación**: Supabase Auth (JWT)
-- **Storage**: Supabase Storage
-- **Frontend**: HTML/CSS/JavaScript (Vanilla)
-- **Deployment**: Vercel
+- **Storage**: Supabase Storage (archivos locales)
+- **Frontend**: HTML5 / CSS3 (Vanilla, sin frameworks) / JavaScript ES6+
+- **Deployment**: Vercel (Serverless Functions)
+- **Esquema**: Metadatos v2 (tabla única optimizada)
 
 ## 📁 Estructura del Proyecto
 

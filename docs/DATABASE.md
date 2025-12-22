@@ -6,9 +6,9 @@ El proyecto utiliza **PostgreSQL 15** (a través de Supabase) con las siguientes
 
 - **Full-Text Search** en español para búsquedas avanzadas
 - **Row Level Security (RLS)** para control de acceso granular
-- **Relaciones Many-to-Many** para autores y etiquetas
+- **Tabla Única (Wide Table)** - Esquema V2 sin JOINs complejos
 - **Índices optimizados** para consultas rápidas
-- **Funciones almacenadas** para lógica de búsqueda compleja
+- **Funciones almacenadas** (`buscar_recursos`) para lógica de búsqueda compleja
 
 ## Diagrama Entidad-Relación
 

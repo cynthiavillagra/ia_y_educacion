@@ -33,3 +33,33 @@ Implementar el set de metadatos "v2" definitivo y consistente, priorizando porta
 - **Breaking Change**: La estructura de la base de datos es incompatible con versiones anteriores.
 - **Migración de Datos**: Se requiere recarga de datos (borrón y cuenta nueva recomendado).
 - **Frontend**: Requiere ajustes menores en los nombres de campos esperados en el JSON si se usaban los antiguos (aunque se mantuvo cierta compatibilidad en el Adapter).
+
+---
+
+## 2025-12-21 (Noche): Migración a Flask + Correcciones Frontend
+
+### 🎯 Objetivo
+Estabilizar la aplicación en producción (Vercel) eliminando problemas de enrutamiento y errores 404/500 persistentes.
+
+### 🛠 Cambios Realizados
+
+#### Backend (API)
+- **Migración a Flask**: Se reemplazó el servidor HTTP manual (`http.server`) por una aplicación Flask robusta.
+- **API Autocontenida**: El archivo `api/index.py` ahora contiene TODO el código necesario (conexión DB, queries, endpoints) sin depender de imports internos que causaban `FUNCTION_INVOCATION_FAILED`.
+- **Rutas Duplicadas**: Se definieron tanto `/api/search` como `/api/material/list` para máxima compatibilidad.
+- **Eliminación de Archivos Legacy**: Se borraron `api/search.py`, `api/recurso_detalle.py`, `api/autores.py`, `api/etiquetas.py` para evitar conflictos de enrutamiento.
+
+#### Frontend
+- **Reescritura de `search.js`**: Código completamente nuevo con:
+    - Manejo robusto de errores (clonado de response para evitar "body stream already read").
+    - Soporte para respuestas V2 (strings) y legacy (arrays).
+    - Mejor feedback visual durante la carga.
+- **Mejora de UX/Tipografía**: Stack de fuentes premium con system fonts para mejor rendimiento y estética.
+- **CSS Vanilla**: Se mantiene el diseño profesional sin dependencia de TailwindCSS CDN.
+
+#### Dependencias
+- **Flask 3.0.0** añadido a `requirements.txt`.
+
+### ⚠️ Notas
+- La base de datos debe estar actualizada al esquema V2 (ejecutar `bbdd_definitiva.sql` + `carga_datos.sql` en Supabase).
+- El despliegue en Vercel puede tardar más la primera vez por la instalación de Flask.
