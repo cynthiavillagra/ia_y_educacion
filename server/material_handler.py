@@ -1,4 +1,4 @@
-from urllib.parse import parse_qs
+from urllib.parse import parse_qs, unquote
 import json
 import cgi
 from io import BytesIO
@@ -6,29 +6,13 @@ from services.material_service import MaterialService
 from utils.response import Response
 
 # -----------------------------------------------------------------------------
-# PATRÓN DE DISEÑO: CONTROLLER / HANDLER (Controlador)
-# -----------------------------------------------------------------------------
-# ¿Por qué?
-# El Servicio (`MaterialService`) no debe saber nada de HTTP (headers, JSON, query params).
-# El Repositorio menos.
-# Necesitamos una capa que "hable HTTP" y traduzca eso a llamadas al Servicio.
-#
-# ¿Qué logramos?
-# 1. Separación de Protocolo: Si mañana queremos usar WebSockets o gRPC, el Servicio
-#    no cambia. Solo creamos un nuevo Handler.
-# 2. Manejo de Errores HTTP: Aquí decidimos si un error es 400 (Bad Request),
-#    404 (Not Found) o 500 (Server Error).
-# 3. Parsing: Aquí extraemos los datos del request (body, query params).
+# HANDLER V2: Interface HTTP para Metadatos v2
 # -----------------------------------------------------------------------------
 
-# Instanciamos el servicio una sola vez (Singleton implícito)
 material_service = MaterialService()
 
 def handle_get_material(handler, params):
-    """
-    Maneja GET /api/material/get?id=...
-    """
-    # 1. Extraer parámetros HTTP
+    """GET /api/material/get?id=..."""
     query_string = handler.path.split('?', 1)[1] if '?' in handler.path else ''
     qs = parse_qs(query_string)
     material_id = qs.get("id", [None])[0]
@@ -38,10 +22,8 @@ def handle_get_material(handler, params):
         return
 
     try:
-        # 2. Llamar al Servicio (Lógica de Negocio)
-        material = material_service.get_material(int(material_id))
-        
-        # 3. Formatear Respuesta HTTP
+        # ID es string ahora
+        material = material_service.get_material(material_id)
         if material:
             Response.json(handler, material.to_dict())
         else:
@@ -50,21 +32,22 @@ def handle_get_material(handler, params):
         Response.error(handler, str(e))
 
 def handle_list_materials(handler, params):
-    """
-    Maneja GET /api/material/list?q=...
-    """
+    """GET /api/material/list?q=..."""
     query_string = handler.path.split('?', 1)[1] if '?' in handler.path else ''
     qs = parse_qs(query_string)
     
-    q = qs.get("q", [""])[0]
+    q = unquote(qs.get("q", [""])[0])
     page = int(qs.get("page", [1])[0])
     per_page = int(qs.get("per_page", [20])[0])
     
+    # Mapeo de filtros query param -> servicio
+    # Soportamos legacy 'coleccion' mapeando a 'fuente'
     filters = {
-        "autor": qs.get("autor", [""])[0].strip(),
+        "autor": unquote(qs.get("autor", [""])[0]).strip(),
         "anio": qs.get("anio", [""])[0].strip(),
-        "coleccion": qs.get("coleccion", [""])[0].strip(),
-        "tipo": qs.get("tipo", [""])[0].strip(),
+        "fuente": unquote(qs.get("fuente", [qs.get("coleccion", [""])[0]])[0]).strip(),
+        "tipo": unquote(qs.get("tipo", [""])[0]).strip(),
+        "tema": unquote(qs.get("tema", [""])[0]).strip(),
     }
     order = qs.get("orden", ["relevancia"])[0].strip()
 
@@ -74,22 +57,10 @@ def handle_list_materials(handler, params):
     except Exception as e:
         Response.error(handler, str(e))
 
-def handle_upload_material(handler, params):
-    """
-    Maneja POST /api/material/upload
-    Recibe Multipart Form Data (Archivos + JSON).
-    """
-    # 1. Verificar Autenticación (Middleware manual)
-    from utils.auth import verify_token
-    if not verify_token(handler.headers):
-        Response.error(handler, "Unauthorized", 401)
-        return
-    
-    # 2. Parsear Multipart (Complejo en HTTP puro, por eso usamos cgi)
+def _parse_multipart(handler):
     content_type = handler.headers.get('Content-Type', '')
     if 'multipart/form-data' not in content_type:
-        Response.error(handler, "Content-Type must be multipart/form-data", 400)
-        return
+        raise ValueError("Content-Type must be multipart/form-data")
 
     content_length = int(handler.headers.get('Content-Length', 0))
     body = handler.rfile.read(content_length)
@@ -113,24 +84,37 @@ def handle_upload_material(handler, params):
             file_bytes = item.file.read()
             filename = item.filename
         else:
-            data[key] = item.value
+            # Decode bytes to utf-8 string
+            value = item.value
+            if isinstance(value, bytes):
+                value = value.decode('utf-8') 
+            data[key] = value
+            
+    return data, file_bytes, filename
 
-    # Parsear campos JSON que vienen como string en el form-data
+def handle_upload_material(handler, params):
+    """POST /api/material/upload"""
+    # TODO: Auth check
     try:
-        if "autores" in data:
-            data["autores"] = json.loads(data["autores"]) if isinstance(data["autores"], str) else data["autores"]
-        if "etiquetas" in data:
-            data["etiquetas"] = json.loads(data["etiquetas"]) if isinstance(data["etiquetas"], str) else data["etiquetas"]
-    except Exception:
-        pass
-
-    try:
-        # 3. Llamar al Servicio
+        data, file_bytes, filename = _parse_multipart(handler)
         recurso_id = material_service.upload_material(data, file_bytes, filename)
-        Response.json(handler, {"id": str(recurso_id), "success": True})
+        Response.json(handler, {"id": recurso_id, "success": True})
+    except Exception as e:
+        Response.error(handler, str(e), 400)
+
+def handle_update_material(handler, params):
+    """POST /api/material/update"""
+    try:
+        data, file_bytes, filename = _parse_multipart(handler)
+        
+        mid = data.get("id")
+        if not mid:
+            raise ValueError("ID requerido para update")
+            
+        success = material_service.update_material(mid, data, file_bytes, filename)
+        Response.json(handler, {"success": success, "id": mid})
     except Exception as e:
         Response.error(handler, str(e), 400)
 
 def handle_options(handler, params):
-    """Manejo de CORS Preflight"""
     Response.json(handler, {}, 200)

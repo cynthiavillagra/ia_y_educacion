@@ -14,52 +14,41 @@ El proyecto utiliza **PostgreSQL 15** (a través de Supabase) con las siguientes
 
 ```mermaid
 erDiagram
-    RECURSOS ||--o{ RECURSO_AUTOR : tiene
-    AUTORES ||--o{ RECURSO_AUTOR : escrito_por
-    RECURSOS ||--o{ RECURSO_ETIQUETA : tiene
-    ETIQUETAS ||--o{ RECURSO_ETIQUETA : clasificado_con
-    RECURSOS }o--|| COLECCIONES : pertenece_a
-    
     RECURSOS {
-        uuid id PK
+        text id PK
         text titulo
-        text resumen
-        varchar codigo_documento UK
-        int año_publicacion
-        timestamptz fecha_ingreso
-        varchar estado_alojamiento
-        text url_descarga
-        varchar licencia_cc
-        varchar tipo_documento
-        uuid id_coleccion FK
+        text titulo_original
+        text tipo_recurso
+        text descripcion_resumen
+        text autores
+        text institucion_fuente
+        text editorial_o_fuente
+        int anio_publicacion
+        date fecha_publicacion
+        text pais_origen
+        text idioma
+        text doi
+        text isbn_issn
+        int numero_paginas
+        text url_fuente_original
+        text url_pdf_directo
+        boolean archivo_local
+        text url_archivo_local
+        text tipo_acceso
+        text licencia
+        text formato
+        text palabras_clave
+        text areas_tematicas
+        text nivel
+        text tipo_publico
+        text contexto_geografico
+        text proporcionado_por
+        text agregado_por
+        date fecha_incorporacion_repo
+        text estado_revision
+        text revisado_por
+        text observaciones
         tsvector vector_busqueda
-    }
-    
-    AUTORES {
-        uuid id PK
-        varchar nombre_autor UK
-    }
-    
-    COLECCIONES {
-        uuid id PK
-        varchar nombre UK
-        text descripcion
-    }
-    
-    ETIQUETAS {
-        uuid id PK
-        varchar nombre_etiqueta UK
-    }
-    
-    RECURSO_AUTOR {
-        uuid recurso_id FK
-        uuid autor_id FK
-        int orden
-    }
-    
-    RECURSO_ETIQUETA {
-        uuid recurso_id FK
-        uuid etiqueta_id FK
     }
 ```
 
@@ -67,82 +56,23 @@ erDiagram
 
 ### Tabla: `recursos`
 
-Tabla principal que almacena los materiales educativos.
+Tabla única (wide table) que consolida todos los metadatos. Se privilegió la portabilidad y simplicidad sobre la normalización extrema.
 
-| Columna | Tipo | Restricciones | Descripción |
-|---------|------|---------------|-------------|
-| `id` | UUID | PK, DEFAULT gen_random_uuid() | Identificador único del recurso |
-| `titulo` | TEXT | NOT NULL | Título del documento |
-| `resumen` | TEXT | NULLABLE | Abstract o descripción extendida |
-| `codigo_documento` | VARCHAR | UNIQUE, NULLABLE | DOI, ISBN u otro identificador |
-| `año_publicacion` | INTEGER | NOT NULL, CHECK >= 1900 | Año de publicación |
-| `fecha_ingreso` | TIMESTAMPTZ | NOT NULL, DEFAULT NOW() | Fecha de registro en el sistema |
-| `estado_alojamiento` | VARCHAR(10) | CHECK IN ('ALOJADO', 'ORIGINAL') | Si el archivo está en Storage o es link externo |
-| `url_descarga` | TEXT | NOT NULL | URL pública del documento |
-| `licencia_cc` | VARCHAR(50) | NOT NULL | Tipo de licencia Creative Commons |
-| `tipo_documento` | VARCHAR(20) | CHECK IN ('ARTICULO', 'TESIS', 'LIBRO', 'INFORME', 'OTRO') | Clasificación del tipo |
-| `id_coleccion` | UUID | FK → colecciones.id, NOT NULL | Colección temática |
-| `vector_busqueda` | TSVECTOR | GENERATED ALWAYS, STORED | Vector de búsqueda full-text |
+| Columna | Tipo | Descripción |
+|---------|------|-------------|
+| `id` | TEXT | PK. Identificador visible (ID SAIA o UUID). |
+| `titulo` | TEXT | Título del recurso. |
+| `tipo_recurso` | TEXT | Enum controlado (paper, libro, informe, etc). |
+| `autores` | TEXT | Lista de autores separados por punto y coma. |
+| `institucion_fuente` | TEXT | Fuente principal (UNESCO, Gobierno, etc). |
+| `anio_publicacion` | INTEGER | Año de publicación. |
+| `archivo_local` | BOOLEAN | Si tenemos copia local alojada. |
+| `url_fuente_original` | TEXT | Link externo original. |
+| `palabras_clave` | TEXT | Etiquetas separadas por coma. |
+| ... | ... | (Ver bbdd_definitiva.sql para lista completa) |
 
-**Restricciones importantes:**
-
-```sql
--- Año válido
-CHECK (año_publicacion >= 1900 AND año_publicacion <= EXTRACT(year FROM now()))
-
--- Estado alojamiento
-CHECK (estado_alojamiento IN ('ALOJADO', 'ORIGINAL'))
-
--- Tipo documento
-CHECK (tipo_documento IN ('ARTICULO', 'TESIS', 'LIBRO', 'INFORME', 'OTRO'))
-```
-
-### Tabla: `autores`
-
-Catálogo de autores (evita duplicados).
-
-| Columna | Tipo | Restricciones | Descripción |
-|---------|------|---------------|-------------|
-| `id` | UUID | PK | Identificador único |
-| `nombre_autor` | VARCHAR | NOT NULL, UNIQUE | Nombre completo del autor |
-
-### Tabla: `colecciones`
-
-Agrupaciones temáticas de recursos.
-
-| Columna | Tipo | Restricciones | Descripción |
-|---------|------|---------------|-------------|
-| `id` | UUID | PK | Identificador único |
-| `nombre` | VARCHAR | NOT NULL, UNIQUE | Nombre de la colección |
-| `descripcion` | TEXT | NULLABLE | Descripción opcional |
-
-### Tabla: `etiquetas`
-
-Palabras clave para clasificación.
-
-| Columna | Tipo | Restricciones | Descripción |
-|---------|------|---------------|-------------|
-| `id` | UUID | PK | Identificador único |
-| `nombre_etiqueta` | VARCHAR | NOT NULL, UNIQUE | Etiqueta normalizada |
-
-### Tabla: `recurso_autor` (Relación N:M)
-
-| Columna | Tipo | Restricciones | Descripción |
-|---------|------|---------------|-------------|
-| `recurso_id` | UUID | FK → recursos.id, ON DELETE CASCADE | ID del recurso |
-| `autor_id` | UUID | FK → autores.id, ON DELETE CASCADE | ID del autor |
-| `orden` | INTEGER | DEFAULT 1 | Orden de aparición del autor |
-
-**PK Compuesta**: `(recurso_id, autor_id)`
-
-### Tabla: `recurso_etiqueta` (Relación N:M)
-
-| Columna | Tipo | Restricciones | Descripción |
-|---------|------|---------------|-------------|
-| `recurso_id` | UUID | FK → recursos.id, ON DELETE CASCADE | ID del recurso |
-| `etiqueta_id` | UUID | FK → etiquetas.id, ON DELETE CASCADE | ID de la etiqueta |
-
-**PK Compuesta**: `(recurso_id, etiqueta_id)`
+**Relaciones Many-to-Many eliminadas**:
+En v2, los autores y etiquetas se manejan como campos de texto plano (CSV/semicolon separated) para simplificar la migración y lectura.
 
 ## Índices de Rendimiento
 
@@ -155,12 +85,9 @@ Los índices mejoran dramáticamente el rendimiento de búsquedas y filtros.
 CREATE INDEX idx_recursos_vector ON recursos USING GIN(vector_busqueda);
 
 -- Índices para filtros comunes
-CREATE INDEX idx_recursos_año ON recursos(año_publicacion);
-CREATE INDEX idx_recursos_coleccion ON recursos(id_coleccion);
-CREATE INDEX idx_recursos_tipo ON recursos(tipo_documento);
-
--- Índice para búsqueda de autores
-CREATE INDEX idx_autores_nombre ON autores(nombre_autor);
+CREATE INDEX idx_recursos_anio ON recursos(anio_publicacion);
+CREATE INDEX idx_recursos_tipo ON recursos(tipo_recurso);
+CREATE INDEX idx_recursos_fuente ON recursos(institucion_fuente);
 ```
 
 ### Análisis de Rendimiento
@@ -181,18 +108,20 @@ Esta columna se calcula automáticamente al insertar/actualizar un recurso:
 ALTER TABLE recursos
 ADD COLUMN vector_busqueda TSVECTOR
 GENERATED ALWAYS AS (
-  -- Peso A (mayor relevancia): Título
-  setweight(to_tsvector('spanish', COALESCE(titulo, '')), 'A') ||
-  -- Peso B (menor relevancia): Resumen
-  setweight(to_tsvector('spanish', COALESCE(resumen, '')), 'B')
+  setweight(to_tsvector('spanish', COALESCE(titulo, '')), 'A') || 
+  setweight(to_tsvector('spanish', COALESCE(descripcion_resumen, '')), 'B') ||
+  setweight(to_tsvector('spanish', COALESCE(palabras_clave, '')), 'C') ||
+  setweight(to_tsvector('spanish', COALESCE(autores, '')), 'D')
 ) STORED;
 ```
 
 **¿Por qué pesos diferentes?**
-- `'A'`: Coincidencias en el **título** son más relevantes
-- `'B'`: Coincidencias en el **resumen** son menos relevantes
+- `'A'`: Título (máxima relevancia)
+- `'B'`: Descripción
+- `'C'`: Palabras clave
+- `'D'`: Autores
 
-Esto afecta el `score` de búsqueda: un documento con la palabra en el título rankeará más alto.
+Esto alimenta al operador `@@` en las búsquedas.
 
 ### Función: `buscar_recursos`
 
@@ -201,43 +130,25 @@ Implementa la lógica de búsqueda completa:
 ```sql
 CREATE OR REPLACE FUNCTION buscar_recursos(p_query TEXT)
 RETURNS TABLE (
-  id UUID,
+  id TEXT,
   titulo TEXT,
-  año_publicacion INTEGER,
+  anio_publicacion INTEGER,
   score REAL
 ) AS $$
 BEGIN
-  -- Caso especial: consulta vacía → devolver todos por fecha de ingreso
   IF p_query IS NULL OR trim(p_query) = '' THEN
     RETURN QUERY
-    SELECT
-      r.id,
-      r.titulo,
-      r.año_publicacion,
-      0.0::REAL AS score
+    SELECT r.id, r.titulo, r.anio_publicacion, 0.0::REAL
     FROM recursos r
-    ORDER BY r.fecha_ingreso DESC;
+    ORDER BY r.fecha_incorporacion_repo DESC;
   ELSE
-    -- Búsqueda normal con full-text search + ILIKE en autores/etiquetas
     RETURN QUERY
-    SELECT
-      r.id,
-      r.titulo,
-      r.año_publicacion,
-      ts_rank(r.vector_busqueda, plainto_tsquery('spanish', p_query)) AS score
+    SELECT r.id, r.titulo, r.anio_publicacion,
+           ts_rank(r.vector_busqueda, plainto_tsquery('spanish', p_query)) AS score
     FROM recursos r
-    LEFT JOIN recurso_autor ra ON r.id = ra.recurso_id
-    LEFT JOIN autores a ON ra.autor_id = a.id
-    LEFT JOIN recurso_etiqueta re ON r.id = re.recurso_id
-    LEFT JOIN etiquetas e ON re.etiqueta_id = e.id
-    WHERE
-      -- Búsqueda en vector (título + resumen)
-      r.vector_busqueda @@ plainto_tsquery('spanish', p_query)
-      -- O búsqueda en nombre de autor
-      OR a.nombre_autor ILIKE '%' || p_query || '%'
-      -- O búsqueda en etiquetas
-      OR e.nombre_etiqueta ILIKE '%' || p_query || '%'
-    GROUP BY r.id
+    WHERE r.vector_busqueda @@ plainto_tsquery('spanish', p_query)
+       OR r.autores ILIKE '%' || p_query || '%'
+       OR r.institucion_fuente ILIKE '%' || p_query || '%'
     ORDER BY score DESC;
   END IF;
 END;
@@ -293,20 +204,7 @@ CREATE POLICY "Solo admins eliminan recursos" ON public.recursos
   USING (auth.role() = 'authenticated');
 ```
 
-#### Tablas de Catálogo (autores, etiquetas, colecciones)
-
-```sql
--- Lectura pública
-CREATE POLICY "Público puede ver autores" ON public.autores
-  FOR SELECT
-  USING (true);
-
--- Modificación solo para admins
-CREATE POLICY "Solo admins modifican autores" ON public.autores
-  FOR ALL
-  USING (auth.role() = 'authenticated')
-  WITH CHECK (auth.role() = 'authenticated');
-```
+*(Las tablas de catálogo se eliminaron en v2 para simplificar el esquema)*.
 
 ### Cómo Funciona RLS
 
@@ -340,29 +238,19 @@ sequenceDiagram
 
 ## Optimizaciones Aplicadas
 
-### 1. Agregación con `json_agg`
+### 1. Tabla Plana (Wide Table)
 
-En vez de múltiples queries, usamos `json_agg` para traer relaciones en una sola query:
+Al consolidar los metadatos en una sola tabla, eliminamos la necesidad de `JOINs` costosos y agregaciones (`json_agg`).
 
+Query v2 simplificada:
 ```sql
-SELECT 
-    r.id, r.titulo,
-    -- Traer autores como JSON array en la misma query
-    COALESCE(json_agg(DISTINCT a.nombre_autor) 
-             FILTER (WHERE a.id IS NOT NULL), '[]') as autores,
-    -- Traer etiquetas también
-    COALESCE(json_agg(DISTINCT e.nombre_etiqueta) 
-             FILTER (WHERE e.id IS NOT NULL), '[]') as etiquetas
-FROM recursos r
-LEFT JOIN recurso_autor ra ON ra.recurso_id = r.id
-LEFT JOIN autores a ON a.id = ra.autor_id
-LEFT JOIN recurso_etiqueta re ON re.recurso_id = r.id
-LEFT JOIN etiquetas e ON e.id = re.etiqueta_id
-GROUP BY r.id
+SELECT id, titulo, autores, palabras_clave
+FROM recursos
+WHERE ...
 ```
 
-**Antes**: 3 queries (recursos + autores + etiquetas)  
-**Después**: 1 query
+**Antes**: 3-4 JOINs por consulta.
+**Ahora**: Acceso directo y rápido a una sola tabla.
 
 ### 2. Queries Parametrizadas
 

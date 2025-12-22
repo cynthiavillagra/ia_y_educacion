@@ -1,62 +1,411 @@
--- Carga de Datos Iniciales (Ejemplo)
+-- Carga de Datos V2 (Metadatos completos)
+-- Ejecutar DESPUÉS de bbdd_definitiva.sql para popular la base con el catálogo inicial.
 
--- 1. Colecciones
-INSERT INTO colecciones (nombre, descripcion) VALUES 
-('UNESCO', 'Recursos educativos de la UNESCO'),
-('UNIPE', 'Universidad Pedagógica Nacional'),
-('OEI', 'Organización de Estados Iberoamericanos')
-ON CONFLICT (nombre) DO NOTHING;
-
--- 2. Autores (Ejemplos)
-INSERT INTO autores (nombre_autor) VALUES 
-('Emily M. Bender'),
-('Timnit Gebru'),
-('Darío Sandrone')
-ON CONFLICT (nombre_autor) DO NOTHING;
-
--- 3. Etiquetas (Ejemplos)
-INSERT INTO etiquetas (nombre_etiqueta) VALUES 
-('IA'),
-('Educación'),
-('Ética'),
-('Política Pública')
-ON CONFLICT (nombre_etiqueta) DO NOTHING;
-
--- 4. Recursos (Ejemplo)
--- Nota: Se requiere obtener los IDs de colecciones, autores y etiquetas primero.
--- En un script real, se haría dinámicamente o con IDs conocidos.
--- A continuación se muestra un bloque anónimo PL/PGSQL para insertar un recurso completo de ejemplo.
-
-DO $$
-DECLARE
-  v_coleccion_id uuid;
-  v_autor_id uuid;
-  v_etiqueta_id uuid;
-  v_recurso_id uuid;
-BEGIN
-  -- Obtener ID de colección
-  SELECT id INTO v_coleccion_id FROM colecciones WHERE nombre = 'UNESCO' LIMIT 1;
-  
-  -- Insertar Recurso
-  INSERT INTO recursos (titulo, resumen, año_publicacion, tipo_documento, estado_alojamiento, url_descarga, licencia_cc, id_coleccion)
-  VALUES (
-    'Guía sobre IA en educación',
-    'Una guía completa sobre el uso de inteligencia artificial en las aulas.',
-    2024,
-    'INFORME',
-    'ORIGINAL',
-    'https://unesco.org/ia-edu',
-    'CC BY 4.0',
-    v_coleccion_id
-  )
-  RETURNING id INTO v_recurso_id;
-
-  -- Asociar Autor
-  SELECT id INTO v_autor_id FROM autores WHERE nombre_autor = 'Emily M. Bender' LIMIT 1;
-  INSERT INTO recurso_autor (recurso_id, autor_id) VALUES (v_recurso_id, v_autor_id);
-
-  -- Asociar Etiqueta
-  SELECT id INTO v_etiqueta_id FROM etiquetas WHERE nombre_etiqueta = 'IA' LIMIT 1;
-  INSERT INTO recurso_etiqueta (recurso_id, etiqueta_id) VALUES (v_recurso_id, v_etiqueta_id);
-
-END $$;
+INSERT INTO recursos (
+  id, titulo, tipo_recurso, autores, institucion_fuente, editorial_o_fuente, 
+  anio_publicacion, pais_origen, idioma, doi, 
+  url_fuente_original, url_pdf_directo, archivo_local, url_archivo_local, 
+  tipo_acceso, formato, areas_tematicas, nivel, contexto_geografico, 
+  proporcionado_por, agregado_por, estado_revision, observaciones
+) VALUES 
+(
+  'SAIA-EDU-003',
+  'Docencia en la era de la inteligencia artificial',
+  'informe',
+  'Fernández Mármol, Keiri',
+  'Universidad de Burgos',
+  'RIUBU (Repositorio Institucional UBU)',
+  NULL,
+  'España',
+  'Español',
+  NULL,
+  'https://riubu.ubu.es/handle/10259/8868?show=full',
+  'https://ice.ua.es/es/recursos-tic/ia/documentos/docencia-en-la-era-de-la-inteligencia-artificial.pdf',
+  true,
+  '', -- PENDIENTE URL LOCAL
+  'abierto',
+  'PDF',
+  'docencia, IA, buenas prácticas',
+  NULL,
+  NULL,
+  'externo',
+  'Anabitarte, Silvia',
+  'publicado',
+  'PDF ya cargado (según captura).'
+),
+(
+  'SAIA-AR-003',
+  'Ejes transversales de la Inteligencia Artificial en Educación',
+  'web_institucional',
+  NULL,
+  'Ministerio de Capital Humano (Secretaría de Educación)',
+  'Argentina.gob.ar (PaideIA)',
+  NULL,
+  'Argentina',
+  'Español',
+  NULL,
+  'https://www.argentina.gob.ar/educacion/paideia/ejes-transversales-de-la-inteligencia-artificial-en-educacion',
+  NULL,
+  false,
+  NULL,
+  'abierto',
+  'HTML',
+  'política educativa, IA',
+  NULL,
+  'Argentina',
+  'externo',
+  'Sistema',
+  'publicado',
+  'Página institucional.'
+),
+(
+  'SAIA-INT-001',
+  'Guía para el uso de IA generativa en educación e investigación',
+  'guia',
+  NULL,
+  'UNESCO',
+  'UNESCO (UNESDOC)',
+  2024,
+  'Internacional',
+  'Español',
+  NULL,
+  'https://unesdoc.unesco.org/ark:/48223/pf0000386693_spa',
+  NULL,
+  true,
+  '', -- PENDIENTE URL LOCAL
+  'abierto',
+  'PDF',
+  'GenAI, educación, investigación',
+  NULL,
+  'global',
+  'externo',
+  'Anabitarte, Silvia',
+  'publicado',
+  'PDF ya cargado (según captura).'
+),
+(
+  'SAIA-INT-002',
+  'La IA y el futuro de la educación: Disrupciones, dilemas y direcciones',
+  'libro',
+  'Isaacs, S. (Ed.)',
+  'UNESCO',
+  'UNESCO Open Access',
+  2025,
+  'Internacional',
+  'Español',
+  '10.54675/KECK1261',
+  'https://doi.org/10.54675/KECK1261',
+  NULL,
+  true,
+  '', -- PENDIENTE URL LOCAL
+  'abierto',
+  'PDF',
+  'IA y educación, policy',
+  NULL,
+  'global',
+  'externo',
+  'Anabitarte, Silvia',
+  'publicado',
+  'Volumen madre (incluye capítulos citados).'
+),
+(
+  'SAIA-EDU-004',
+  'IA en la escuela – Guía para un uso crítico',
+  'guia',
+  NULL,
+  'Gobierno de la Ciudad de Buenos Aires',
+  'BuenosAires.gob.ar',
+  NULL,
+  'Argentina',
+  'Español',
+  NULL,
+  'https://buenosaires.gob.ar/sites/default/files/2025-07/IA%20en%20la%20escuela%20-%20Gu%C3%ADa%20para%20un%20uso%20cr%C3%ADtico.pdf',
+  NULL,
+  true,
+  '', -- PENDIENTE URL LOCAL
+  'abierto',
+  'PDF',
+  'IA, escuela, uso crítico',
+  NULL,
+  'Argentina',
+  'externo',
+  'Anabitarte, Silvia',
+  'publicado',
+  'PDF ya cargado (según captura).'
+),
+(
+  'SAIA-EDU-002',
+  'Guía para estudiantes sobre cómo desenvolverse en la universidad en la era de la IA',
+  'guia',
+  NULL,
+  'UCES',
+  'UCES / StudentGuideToAI',
+  2024,
+  'Argentina',
+  'Español',
+  NULL,
+  'http://www.studentguidetoAI.org',
+  NULL,
+  true,
+  '', -- PENDIENTE URL LOCAL
+  'abierto',
+  'MIXTO',
+  'estudiantes, IA, universidad',
+  NULL,
+  'Argentina',
+  'externo',
+  'Anabitarte, Silvia',
+  'publicado',
+  'En captura figura PDF local UCES.'
+),
+(
+  'SAIA-AR-005',
+  'Ley Simple: Recomendaciones para el uso de Inteligencia Artificial',
+  'articulo_web', -- 'divulgacion' no está en enum, mapeado a articulo_web o guia
+  NULL,
+  'Argentina.gob.ar (Ministerio de Justicia)',
+  'Derecho Fácil / Ley Simple',
+  NULL,
+  'Argentina',
+  'Español',
+  NULL,
+  'https://www.argentina.gob.ar/justicia/derechofacil/leysimple/inteligencia-artificial',
+  NULL,
+  false,
+  NULL,
+  'abierto',
+  'HTML',
+  'uso responsable, marco legal',
+  NULL,
+  'Argentina',
+  'externo',
+  'Sistema',
+  'publicado',
+  'Recurso divulgativo.'
+),
+(
+  'SAIA-AR-006',
+  'Disposición 2/2023 (Infoleg)',
+  'normativa',
+  NULL,
+  'Estado Argentino (Infoleg)',
+  'Infoleg',
+  2023,
+  'Argentina',
+  'Español',
+  NULL,
+  'https://servicios.infoleg.gob.ar/infolegInternet/anexos/380000-384999/384656/norma.htm',
+  NULL,
+  false,
+  NULL,
+  'abierto',
+  'HTML',
+  'regulación, IA',
+  NULL,
+  'Argentina',
+  'externo',
+  'Sistema',
+  'publicado',
+  'Norma oficial citada por varias fuentes.'
+),
+(
+  'SAIA-AR-007',
+  'Resolución 161/2023 (Boletín Oficial)',
+  'normativa',
+  NULL,
+  'Estado Argentino',
+  'Boletín Oficial',
+  2023,
+  'Argentina',
+  'Español',
+  NULL,
+  'https://www.boletinoficial.gob.ar/detalleAviso/primera/293363/20230904',
+  NULL,
+  false,
+  NULL,
+  'abierto',
+  'HTML',
+  'regulación, IA',
+  NULL,
+  'Argentina',
+  'externo',
+  'Sistema',
+  'publicado',
+  'Norma oficial citada por WSC Legal.'
+),
+(
+  'SAIA-AR-008',
+  'Proyecto Modificación Ley 25.326 (Protección de Datos Personales)',
+  'normativa', -- Enum 'proyecto_ley' no existe, usando 'normativa'
+  NULL,
+  'Estado Argentino (referencia)',
+  'Documento (Drive)',
+  NULL,
+  'Argentina',
+  'Español',
+  NULL,
+  'https://drive.google.com/file/d/1TRb9c3Y0W6MRTPWjEW9be2jsMj3QllYW/view',
+  NULL,
+  false,
+  NULL,
+  'abierto',
+  'PDF',
+  'datos personales, regulación',
+  NULL,
+  'Argentina',
+  'externo',
+  'Sistema',
+  'publicado',
+  'Link citado por WSC Legal.'
+),
+(
+  'SAIA-AR-002',
+  'Regulación de la Inteligencia Artificial en Argentina (WSC Legal)',
+  'articulo_web',
+  'Martínez, V.; Celotto, M.',
+  'WSC Legal',
+  'WSC Legal',
+  NULL,
+  'Argentina',
+  'Español',
+  NULL,
+  '', -- Url vacía? Dejar string vacío o NULL (columna es NOT NULL, poniendo placeholder)
+  NULL,
+  false,
+  NULL,
+  'abierto',
+  'WEB',
+  'regulación, IA, Argentina',
+  NULL,
+  'Argentina',
+  'externo',
+  'Sistema',
+  'publicado',
+  'No se aportó URL central del artículo.'
+),
+(
+  'SAIA-INF-001',
+  'Metodologías activas + Inteligencia Artificial',
+  'material_docente',
+  'Videla, Franco',
+  'Desconocida', -- Placeholder para NOT NULL
+  NULL,
+  NULL,
+  NULL,
+  'Español',
+  NULL,
+  'https://www.linkedin.com/in/franco-videla-/',
+  NULL,
+  true,
+  '', -- PENDIENTE URL LOCAL
+  'abierto',
+  'PDF',
+  'metodologías activas, IA',
+  NULL,
+  NULL,
+  'externo',
+  'Anabitarte, Silvia',
+  'publicado',
+  'En captura figura PDF local.'
+),
+(
+  'SAIA-EDU-005',
+  'Proyectos prácticos de IA para el aula (ISTE)',
+  'guia',
+  NULL,
+  'ISTE',
+  'ISTE',
+  NULL,
+  'Internacional',
+  NULL,
+  NULL,
+  'https://www.iste.org/books',
+  NULL,
+  true,
+  '', -- PENDIENTE URL LOCAL
+  'abierto',
+  'MIXTO',
+  'proyectos, aula, IA',
+  NULL,
+  'global',
+  'externo',
+  'Anabitarte, Silvia',
+  'publicado',
+  'En captura figura PDF local; portal ISTE queda como fuente.'
+),
+(
+  'SAIA-EDU-001',
+  'ChatGPT y educación universitaria: posibilidades y límites',
+  'libro',
+  'Ribera, Mireia; Díaz, Oliver (Coords.)',
+  'Editorial Octaedro',
+  'Octaedro',
+  2024,
+  'España',
+  'Español',
+  NULL,
+  'https://octaedro.com/wp-content/uploads/2024/09/9788410054011.pdf',
+  NULL,
+  false,
+  NULL,
+  'abierto',
+  'PDF',
+  'ChatGPT, docencia universitaria',
+  NULL,
+  'internacional',
+  'externo',
+  'Sistema',
+  'publicado',
+  'Link directo provisto por vos.'
+),
+(
+  'SAIA-EDU-006',
+  'Guía rápida alumnos – Inteligencia Artificial',
+  'guia',
+  NULL,
+  'Tecnológico de Monterrey',
+  'Tec de Monterrey',
+  NULL,
+  'México',
+  'Español',
+  NULL,
+  'https://tec.mx/sites/default/files/repositorio/integridad-academica/guia-rapida-alumnos-inteligencia-artificial.pdf',
+  NULL,
+  true,
+  '', -- PENDIENTE URL LOCAL
+  'abierto',
+  'PDF',
+  'estudiantes, integridad académica, IA',
+  NULL,
+  'LATAM',
+  'externo',
+  'Anabitarte, Silvia',
+  'publicado',
+  'PDF ya cargado (según captura).'
+),
+(
+  'SAIA-AR-001',
+  'Nuevas Tecnologías de la Información y la Conectividad (NTICx)',
+  'diseno_curricular', -- Mapeado de normativa_curricular
+  NULL,
+  'Dirección General de Cultura y Educación (PBA)',
+  'ABC / PBA',
+  2010,
+  'Argentina',
+  'Español',
+  NULL,
+  'http://abc.gob.ar/secretarias/sites/default/files/2021-03/nticx.pdf',
+  NULL,
+  false,
+  NULL,
+  'abierto',
+  'PDF',
+  'currículo, TIC',
+  NULL,
+  'Argentina',
+  'externo',
+  'Sistema',
+  'publicado',
+  'Diseño curricular oficial.'
+)
+ON CONFLICT (id) DO NOTHING;

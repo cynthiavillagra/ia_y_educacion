@@ -1,44 +1,53 @@
 from domain.material import Material
+from typing import List, Optional
 
 # -----------------------------------------------------------------------------
-# PATRÓN DE DISEÑO: ADAPTER (Adaptador)
+# PATRÓN DE DISEÑO: ADAPTER (Adaptador) - [DEPRECATED / LEGACY SUPPORT]
 # -----------------------------------------------------------------------------
-# ¿Por qué?
-# La base de datos (Supabase/Postgres) nos devuelve datos "crudos" (diccionarios,
-# tuplas, nombres de columnas con guiones bajos, etc.).
-# Nuestra aplicación quiere trabajar con objetos limpios y bien definidos (Clase Material).
-#
-# ¿Qué logramos?
-# 1. Traducción: Convertimos el "idioma" de la base de datos al "idioma" del dominio.
-# 2. Protección: Si cambiamos el nombre de una columna en la DB, solo tocamos este
-#    archivo. El resto de la app sigue usando `material.titulo` sin enterarse.
+# Este archivo se mantiene por compatibilidad si algún test lo usa.
+# En la versión v2, el repositorio devuelve Material directamente.
 # -----------------------------------------------------------------------------
 
 def to_material(row: dict, autores: list, etiquetas: list) -> Material:
     """
-    Convierte (adapta) los datos crudos de la base de datos a una instancia de Material.
-    
-    Args:
-        row: Diccionario con los datos de la tabla 'recursos'.
-        autores: Lista de nombres de autores.
-        etiquetas: Lista de nombres de etiquetas.
-    
-    Returns:
-        Una instancia limpia de la clase Material.
+    Intenta adaptar datos viejos al nuevo esquema.
+    Advertencia: Es una conversión simple ("best effort").
     """
+    
+    # Intentamos construir un Material v2 con lo que tenemos
     return Material(
-        id=row.get("id"),
-        titulo=row.get("titulo"),
-        resumen=row.get("resumen"),
+        id=str(row.get("id", "")),
+        titulo=row.get("titulo", "Sin título"),
+        titulo_original=None,
+        tipo_recurso=row.get("tipo_documento", "desconocido"), # Mapping approx
+        descripcion_resumen=row.get("resumen"),
+        autores="; ".join(autores) if autores else "",
+        institucion_autora=None,
+        institucion_fuente=row.get("coleccion", "Desconocida"),
+        editorial_o_fuente=None,
         anio_publicacion=row.get("año_publicacion"),
-        # Normalizamos la fecha a string ISO o None si viene vacía
-        fecha_ingreso=row.get("fecha_ingreso"), 
-        estado_alojamiento=row.get("estado_alojamiento"),
-        url_descarga=row.get("url_descarga"),
-        licencia_cc=row.get("licencia_cc"),
-        tipo_documento=row.get("tipo_documento"),
-        codigo_documento=row.get("codigo_documento"),
-        coleccion=row.get("coleccion"), # Puede venir de un JOIN
-        autores=autores,
-        etiquetas=etiquetas
+        fecha_publicacion=None,
+        pais_origen=None,
+        idioma=None,
+        doi=row.get("codigo_documento"), # Asumimos que codigo era un DOI a veces
+        isbn_issn=None,
+        numero_paginas=None,
+        url_fuente_original=row.get("url_descarga", ""), # Asumimos link principal
+        url_pdf_directo=None,
+        archivo_local=row.get("estado_alojamiento") == "ALOJADO",
+        url_archivo_local=row.get("url_descarga") if row.get("estado_alojamiento") == "ALOJADO" else None,
+        tipo_acceso="abierto", # Default
+        licencia=row.get("licencia_cc"),
+        formato="PDF", # Default
+        palabras_clave=", ".join(etiquetas) if etiquetas else "",
+        areas_tematicas=None,
+        nivel=None,
+        tipo_publico=None,
+        contexto_geografico=None,
+        proporcionado_por="mixto",
+        agregado_por="migration",
+        fecha_incorporacion_repo=str(row.get("fecha_ingreso")),
+        estado_revision="publicado",
+        revisado_por=None,
+        observaciones=None
     )

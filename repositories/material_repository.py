@@ -6,96 +6,53 @@ from domain.material import Material
 from adapters.material_adapter import to_material
 
 # -----------------------------------------------------------------------------
-# PATRÓN DE DISEÑO: REPOSITORY (Repositorio)
-# -----------------------------------------------------------------------------
-# ¿Por qué?
-# El código que accede a la base de datos (SQL, conexiones, cursores) es "sucio"
-# y técnico. No queremos mezclarlo con la lógica de negocio (reglas, validaciones).
-#
-# ¿Qué logramos?
-# 1. Abstracción: El Servicio pide "dame el material 5" (`get_by_id`). No le importa
-#    si viene de Postgres, de un archivo JSON o de una API externa.
-# 2. Centralización: Todo el SQL vive acá. Si hay que optimizar una query, sabemos
-#    exactamente dónde buscar.
-# 3. Testabilidad: Es fácil crear un "FakeMaterialRepository" para tests que no
-#    necesite base de datos real.
+# REPOSITORIO v2: Adaptado a esquema plano (Metadatos v2)
 # -----------------------------------------------------------------------------
 
 class MaterialRepository:
-    def get_by_id(self, material_id: int) -> Optional[Material]:
+    def get_by_id(self, material_id: str) -> Optional[Material]:
         """
-        Busca un material por ID y devuelve un objeto de Dominio.
-        Usa el patrón Adapter (`to_material`) al final para limpiar la salida.
+        Busca un recurso por su ID visible (SAIA-EDU-xxx).
         """
         conn = get_connection()
         try:
             with conn.cursor() as cur:
-                # Query principal a la tabla recursos + join con colecciones
                 cur.execute(
                     """
-                    SELECT r.id, r.titulo, r.resumen, r.año_publicacion, r.fecha_ingreso,
-                           r.estado_alojamiento, r.url_descarga, r.licencia_cc,
-                           r.tipo_documento, r.codigo_documento, c.nombre AS coleccion
-                    FROM recursos r
-                    JOIN colecciones c ON c.id = r.id_coleccion
-                    WHERE r.id = %s
+                    SELECT 
+                        id, titulo, titulo_original, tipo_recurso, descripcion_resumen,
+                        autores, institucion_autora, institucion_fuente, editorial_o_fuente,
+                        anio_publicacion, fecha_publicacion, pais_origen, idioma, doi, isbn_issn, numero_paginas,
+                        url_fuente_original, url_pdf_directo, archivo_local, url_archivo_local, tipo_acceso, licencia, formato,
+                        palabras_clave, areas_tematicas, nivel, tipo_publico, contexto_geografico,
+                        proporcionado_por, agregado_por, fecha_incorporacion_repo, estado_revision, revisado_por, observaciones
+                    FROM recursos
+                    WHERE id = %s
                     """,
                     (material_id,),
                 )
                 row = cur.fetchone()
                 if not row:
                     return None
-
-                # Sub-query para autores (relación muchos a muchos)
-                cur.execute(
-                    """
-                    SELECT a.nombre_autor
-                    FROM recurso_autor ra
-                    JOIN autores a ON a.id = ra.autor_id
-                    WHERE ra.recurso_id = %s
-                    ORDER BY ra.orden ASC
-                    """,
-                    (material_id,),
+                
+                # Mapeo directo a objeto Material (asumiendo orden correcto)
+                # Al ser una tabla plana, el mapeo es 1:1.
+                # Validar tipos (fechas a str si hace falta)
+                return Material(
+                    id=row[0], titulo=row[1], titulo_original=row[2], tipo_recurso=row[3], descripcion_resumen=row[4],
+                    autores=row[5], institucion_autora=row[6], institucion_fuente=row[7], editorial_o_fuente=row[8],
+                    anio_publicacion=row[9], fecha_publicacion=str(row[10]) if row[10] else None, 
+                    pais_origen=row[11], idioma=row[12], doi=row[13], isbn_issn=row[14], numero_paginas=row[15],
+                    url_fuente_original=row[16], url_pdf_directo=row[17], archivo_local=row[18], url_archivo_local=row[19],
+                    tipo_acceso=row[20], licencia=row[21], formato=row[22],
+                    palabras_clave=row[23], areas_tematicas=row[24], nivel=row[25], tipo_publico=row[26], contexto_geografico=row[27],
+                    proporcionado_por=row[28], agregado_por=row[29], fecha_incorporacion_repo=str(row[30]) if row[30] else None,
+                    estado_revision=row[31], revisado_por=row[32], observaciones=row[33]
                 )
-                autores = [r[0] for r in cur.fetchall()]
-
-                # Sub-query para etiquetas
-                cur.execute(
-                    """
-                    SELECT e.nombre_etiqueta
-                    FROM recurso_etiqueta re
-                    JOIN etiquetas e ON e.id = re.etiqueta_id
-                    WHERE re.recurso_id = %s
-                    ORDER BY e.nombre_etiqueta
-                    """,
-                    (material_id,),
-                )
-                etiquetas = [r[0] for r in cur.fetchall()]
-
-                # Construimos un diccionario intermedio para pasarlo al Adapter
-                data = {
-                    "id": row[0],
-                    "titulo": row[1],
-                    "resumen": row[2],
-                    "año_publicacion": row[3],
-                    "fecha_ingreso": row[4].isoformat() if row[4] else None,
-                    "estado_alojamiento": row[5],
-                    "url_descarga": row[6],
-                    "licencia_cc": row[7],
-                    "tipo_documento": row[8],
-                    "codigo_documento": row[9],
-                    "coleccion": row[10]
-                }
-                # Usamos el Adapter para devolver un objeto limpio
-                return to_material(data, autores, etiquetas)
         finally:
             conn.close()
 
     def search(self, query: str, filters: Dict[str, Any], page: int = 1, per_page: int = 20, order: str = "relevancia") -> Dict[str, Any]:
-        """
-        Realiza una búsqueda compleja con filtros dinámicos.
-        Mantiene la lógica SQL encapsulada aquí.
-        """
         offset = (page - 1) * per_page
         conn = get_connection()
         try:
@@ -103,83 +60,89 @@ class MaterialRepository:
                 sql_filters = []
                 query_params = []
                 
-                # Construcción dinámica de filtros SQL
-                autor = filters.get("autor")
-                if autor:
-                    sql_filters.append("(EXISTS (SELECT 1 FROM recurso_autor ra_f JOIN autores a_f ON ra_f.autor_id = a_f.id WHERE ra_f.recurso_id = r.id AND a_f.nombre_autor ILIKE %s) OR c.nombre ILIKE %s)")
-                    query_params.append(f"%{autor}%")
-                    query_params.append(f"%{autor}%")
+                # Filtros dinámicos (v2)
+                if filters.get("autor"):
+                    sql_filters.append("autores ILIKE %s")
+                    query_params.append(f"%{filters.get('autor')}%")
                 
                 if filters.get("anio"):
-                    sql_filters.append("r.año_publicacion = %s")
+                    sql_filters.append("anio_publicacion = %s")
                     query_params.append(int(filters.get("anio")))
                 
-                if filters.get("coleccion"):
-                    sql_filters.append("c.nombre = %s")
-                    query_params.append(filters.get("coleccion"))
+                if filters.get("fuente"):
+                    sql_filters.append("institucion_fuente ILIKE %s")
+                    query_params.append(f"%{filters.get('fuente')}%")
                 
                 if filters.get("tipo"):
-                    sql_filters.append("r.tipo_documento = %s")
+                    sql_filters.append("tipo_recurso = %s")
                     query_params.append(filters.get("tipo"))
+
+                if filters.get("tema"):
+                    sql_filters.append("(palabras_clave ILIKE %s OR areas_tematicas ILIKE %s)")
+                    val = f"%{filters.get('tema')}%"
+                    query_params.append(val)
+                    query_params.append(val)
 
                 where_clause = (" AND ".join(sql_filters)) if sql_filters else "TRUE"
 
-                # 1. Contar total de resultados (para paginación)
-                total_sql = f"""
-                    SELECT COUNT(DISTINCT r.id)
-                    FROM buscar_recursos(%s) sr
-                    JOIN recursos r ON r.id = sr.id
-                    LEFT JOIN colecciones c ON c.id = r.id_coleccion
-                    WHERE {where_clause}
-                """
-                cur.execute(total_sql, [query] + query_params)
+                # 1. Total (Paginación)
+                # Usamos la función buscar_recursos que ya encapsula FTS si hay query, o nada si no la hay.
+                # PERO buscar_recursos devuelve (id, titulo...)
+                # Si hay texto de búsqueda, unimos con el resultado de la función.
+                # Si NO hay texto, filtramos directo la tabla.
+                
+                if query and query.strip():
+                    base_from = "buscar_recursos(%s) sr JOIN recursos r ON r.id = sr.id"
+                    base_params = [query]
+                else:
+                    base_from = "recursos r"
+                    base_params = []
+                
+                # Total Count
+                count_sql = f"SELECT COUNT(*) FROM {base_from} WHERE {where_clause}"
+                cur.execute(count_sql, base_params + query_params)
                 total = cur.fetchone()[0]
 
-                # 2. Definir ordenamiento
+                # 2. Orden
                 if order == "anio_asc":
-                    order_sql = "r.año_publicacion ASC, sr.score DESC"
+                    order_sql = "r.anio_publicacion ASC"
                 elif order == "anio_desc":
-                    order_sql = "r.año_publicacion DESC, sr.score DESC"
-                elif order == "fecha_ingreso_desc":
-                    order_sql = "r.fecha_ingreso DESC, sr.score DESC"
+                    order_sql = "r.año_publicacion DESC" # Ojo con el nombre de col si cambia en DB
+                elif order == "recientes":
+                    order_sql = "r.fecha_incorporacion_repo DESC"
                 else:
-                    order_sql = "sr.score DESC"
+                    # Si hay búsqueda FTS, score DESC. Si no, recientes.
+                    order_sql = "sr.score DESC" if query and query.strip() else "r.fecha_incorporacion_repo DESC"
 
-                # 3. Obtener los items paginados
-                # Usamos json_agg para traer autores y etiquetas en la misma query (optimización)
+                # 3. Items
+                if query and query.strip():
+                     select_cols = "sr.id, r.titulo, r.anio_publicacion, sr.score, r.descripcion_resumen, r.tipo_recurso, r.autores, r.palabras_clave, r.institucion_fuente"
+                else:
+                     select_cols = "r.id, r.titulo, r.anio_publicacion, 0.0 as score, r.descripcion_resumen, r.tipo_recurso, r.autores, r.palabras_clave, r.institucion_fuente"
+
                 items_sql = f"""
-                    SELECT sr.id, r.titulo, r.año_publicacion, sr.score,
-                           r.resumen, r.tipo_documento,
-                           COALESCE(json_agg(DISTINCT a.nombre_autor) FILTER (WHERE a.id IS NOT NULL), '[]') as autores,
-                           COALESCE(json_agg(DISTINCT e.nombre_etiqueta) FILTER (WHERE e.id IS NOT NULL), '[]') as etiquetas,
-                           c.nombre as coleccion
-                    FROM buscar_recursos(%s) sr
-                    JOIN recursos r ON r.id = sr.id
-                    LEFT JOIN colecciones c ON c.id = r.id_coleccion
-                    LEFT JOIN recurso_autor ra ON ra.recurso_id = r.id
-                    LEFT JOIN autores a ON a.id = ra.autor_id
-                    LEFT JOIN recurso_etiqueta re ON re.recurso_id = r.id
-                    LEFT JOIN etiquetas e ON e.id = re.etiqueta_id
+                    SELECT {select_cols}
+                    FROM {base_from}
                     WHERE {where_clause}
-                    GROUP BY sr.id, r.titulo, r.año_publicacion, sr.score, r.resumen, r.tipo_documento, c.nombre
                     ORDER BY {order_sql}
                     LIMIT %s OFFSET %s
                 """
-                cur.execute(items_sql, [query] + query_params + [per_page, offset])
+                
+                full_params = base_params + query_params + [per_page, offset]
+                cur.execute(items_sql, full_params)
                 rows = cur.fetchall()
 
-                # Mapeo simple a diccionario
                 items = [
                     {
                         "id": r[0], 
                         "titulo": r[1], 
-                        "año_publicacion": r[2], 
-                        "score": float(r[3]) if r[3] is not None else 0.0,
+                        "anio_publicacion": r[2], 
+                        "score": float(r[3]),
                         "resumen": r[4],
-                        "tipo_documento": r[5],
-                        "autores": r[6],
-                        "etiquetas": r[7],
-                        "coleccion": r[8]
+                        "tipo_recurso": r[5],
+                        "autores": r[6], # Ya viene como string plano
+                        "etiquetas": r[7], # Ya viene como string plano
+                        "institucion": r[8]
                     }
                     for r in rows
                 ]
@@ -187,84 +150,83 @@ class MaterialRepository:
         finally:
             conn.close()
 
-    def create(self, data: Dict[str, Any]) -> int:
+    def create(self, data: Material) -> str:
         """
-        Inserta un nuevo recurso en la base de datos.
-        Maneja transacciones implícitas (autores, etiquetas, recurso).
+        Inserta un nuevo recurso (simple INSERT).
         """
         conn = get_connection()
         try:
-            with conn: # Context manager maneja commit/rollback automáticamente
-                with conn.cursor() as cur:
-                    # 1. Resolver ID de colección
-                    cur.execute("SELECT id FROM colecciones WHERE nombre=%s", (data["coleccion"],))
-                    row = cur.fetchone()
-                    if not row:
-                        raise ValueError("Colección inexistente")
-                    id_coleccion = row[0]
-
-                    # 2. Insertar Recurso
-                    cur.execute(
-                        """
-                        INSERT INTO recursos (titulo, resumen, codigo_documento, año_publicacion, estado_alojamiento,
-                                              url_descarga, licencia_cc, tipo_documento, id_coleccion)
-                        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)
-                        RETURNING id
-                        """,
-                        (
-                            data["titulo"], data["resumen"], data["codigo_documento"], data["año_publicacion"],
-                            data["estado_alojamiento"], data["url_descarga"], data["licencia_cc"],
-                            data["tipo_documento"], id_coleccion,
-                        ),
+            with conn.cursor() as cur:
+                cur.execute(
+                    """
+                    INSERT INTO recursos (
+                        id, titulo, titulo_original, tipo_recurso, descripcion_resumen,
+                        autores, institucion_autora, institucion_fuente, editorial_o_fuente,
+                        anio_publicacion, fecha_publicacion, pais_origen, idioma, doi, isbn_issn, numero_paginas,
+                        url_fuente_original, url_pdf_directo, archivo_local, url_archivo_local, tipo_acceso, licencia, formato,
+                        palabras_clave, areas_tematicas, nivel, tipo_publico, contexto_geografico,
+                        proporcionado_por, agregado_por, estado_revision, revisado_por, observaciones
+                    ) VALUES (
+                        %s, %s, %s, %s, %s,
+                        %s, %s, %s, %s,
+                        %s, %s, %s, %s, %s, %s, %s,
+                        %s, %s, %s, %s, %s, %s, %s,
+                        %s, %s, %s, %s, %s,
+                        %s, %s, %s, %s, %s
                     )
-                    recurso_id = cur.fetchone()[0]
+                    RETURNING id
+                    """,
+                    (
+                        data.id, data.titulo, data.titulo_original, data.tipo_recurso, data.descripcion_resumen,
+                        data.autores, data.institucion_autora, data.institucion_fuente, data.editorial_o_fuente,
+                        data.anio_publicacion, data.fecha_publicacion, data.pais_origen, data.idioma, data.doi, data.isbn_issn, data.numero_paginas,
+                        data.url_fuente_original, data.url_pdf_directo, data.archivo_local, data.url_archivo_local, data.tipo_acceso, data.licencia, data.formato,
+                        data.palabras_clave, data.areas_tematicas, data.nivel, data.tipo_publico, data.contexto_geografico,
+                        data.proporcionado_por, data.agregado_por, data.estado_revision, data.revisado_por, data.observaciones
+                    )
+                )
+                conn.commit()
+                return cur.fetchone()[0]
+        finally:
+            conn.close()
 
-                    # 3. Manejar Autores (Insertar si no existen + Relación)
-                    orden = 1
-                    for nombre in data["autores"]:
-                        cur.execute("SELECT id FROM autores WHERE nombre_autor=%s", (nombre,))
-                        a = cur.fetchone()
-                        if not a:
-                            cur.execute("INSERT INTO autores (nombre_autor) VALUES (%s) RETURNING id", (nombre,))
-                            autor_id = cur.fetchone()[0]
-                        else:
-                            autor_id = a[0]
-                        cur.execute(
-                            "INSERT INTO recurso_autor (recurso_id, autor_id, orden) VALUES (%s,%s,%s) ON CONFLICT DO NOTHING",
-                            (recurso_id, autor_id, orden),
-                        )
-                        orden += 1
-
-                    # 4. Manejar Etiquetas
-                    for tag in data["etiquetas"]:
-                        cur.execute("SELECT id FROM etiquetas WHERE nombre_etiqueta=%s", (tag,))
-                        e = cur.fetchone()
-                        if not e:
-                            cur.execute("INSERT INTO etiquetas (nombre_etiqueta) VALUES (%s) RETURNING id", (tag,))
-                            etiqueta_id = cur.fetchone()[0]
-                        else:
-                            etiqueta_id = e[0]
-                        cur.execute(
-                            "INSERT INTO recurso_etiqueta (recurso_id, etiqueta_id) VALUES (%s,%s) ON CONFLICT DO NOTHING",
-                            (recurso_id, etiqueta_id),
-                        )
-                    
-                    return recurso_id
+    
+    def update(self, data: Material) -> bool:
+        """
+        Actualiza un recurso existente.
+        """
+        conn = get_connection()
+        try:
+            with conn.cursor() as cur:
+                cur.execute(
+                    """
+                    UPDATE recursos SET
+                        titulo = %s, titulo_original = %s, tipo_recurso = %s, descripcion_resumen = %s,
+                        autores = %s, institucion_autora = %s, institucion_fuente = %s, editorial_o_fuente = %s,
+                        anio_publicacion = %s, fecha_publicacion = %s, pais_origen = %s, idioma = %s, doi = %s, isbn_issn = %s, numero_paginas = %s,
+                        url_fuente_original = %s, url_pdf_directo = %s, archivo_local = %s, url_archivo_local = %s, tipo_acceso = %s, licencia = %s, formato = %s,
+                        palabras_clave = %s, areas_tematicas = %s, nivel = %s, tipo_publico = %s, contexto_geografico = %s,
+                        proporcionado_por = %s, estado_revision = %s, revisado_por = %s, observaciones = %s
+                    WHERE id = %s
+                    """,
+                    (
+                        data.titulo, data.titulo_original, data.tipo_recurso, data.descripcion_resumen,
+                        data.autores, data.institucion_autora, data.institucion_fuente, data.editorial_o_fuente,
+                        data.anio_publicacion, data.fecha_publicacion, data.pais_origen, data.idioma, data.doi, data.isbn_issn, data.numero_paginas,
+                        data.url_fuente_original, data.url_pdf_directo, data.archivo_local, data.url_archivo_local, data.tipo_acceso, data.licencia, data.formato,
+                        data.palabras_clave, data.areas_tematicas, data.nivel, data.tipo_publico, data.contexto_geografico,
+                        data.proporcionado_por, data.estado_revision, data.revisado_por, data.observaciones,
+                        data.id
+                    )
+                )
+                conn.commit()
+                return cur.rowcount > 0
         finally:
             conn.close()
 
     def upload_file(self, file_bytes: bytes, filename: str) -> str:
-        """
-        Delega la subida de archivos al Facade de Supabase.
-        El repositorio coordina datos (DB) y archivos (Storage).
-        """
         import uuid
-        # Generamos un nombre único para evitar colisiones
         path = f"uploads/{uuid.uuid4()}_{filename}"
         bucket = "recursos-alojados" 
-        
-        # Usamos el Facade
         supabase_client.upload_file(bucket, path, file_bytes)
-        
-        # Retornamos la URL pública para guardarla en la DB
         return supabase_client.get_public_url(bucket, path)

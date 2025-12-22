@@ -174,8 +174,8 @@ sequenceDiagram
     Service->>Repo: get_by_id(123)
     Repo->>DB: SELECT * FROM recursos WHERE id=123
     DB-->>Repo: Row data
-    Repo->>Adapter: to_material(row, autores, etiquetas)
-    Adapter-->>Repo: Material object
+    Repo->>Adapter: to_material(row) -- (Mapeo directo)
+    Repo-->>Service: Material object
     Repo-->>Service: Material object
     Service-->>Handler: Material object
     Handler->>Handler: material.to_dict()
@@ -230,11 +230,7 @@ sequenceDiagram
     end
     
     Service->>Repo: create(clean_data)
-    Repo->>DB: BEGIN TRANSACTION
     Repo->>DB: INSERT INTO recursos...
-    Repo->>DB: INSERT INTO autores...
-    Repo->>DB: INSERT INTO etiquetas...
-    Repo->>DB: COMMIT
     DB-->>Repo: recurso_id
     Repo-->>Service: recurso_id
     Service-->>Handler: recurso_id

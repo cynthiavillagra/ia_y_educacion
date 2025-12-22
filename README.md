@@ -180,13 +180,13 @@ curl "http://localhost:8000/api/material/list?q=inteligencia+artificial&page=1&p
   "total": 45,
   "items": [
     {
-      "id": 1,
+      "id": "SAIA-EDU-001",
       "titulo": "Introducción a la IA en Educación",
-      "año_publicacion": 2023,
+      "anio_publicacion": 2023,
       "score": 0.95,
-      "autores": ["García, M.", "López, J."],
-      "etiquetas": ["inteligencia artificial", "educación"],
-      "coleccion": "IA y Educación"
+      "autores": "García, M.; López, J.",
+      "etiquetas": "inteligencia artificial, educación",
+      "institucion_fuente": "IA y Educación"
     }
   ]
 }
@@ -199,7 +199,7 @@ El esquema incluye:
 - **Full-Text Search** en español con `tsvector` y `ts_rank`
 - **Row Level Security (RLS)** para control de acceso granular
 - **Índices optimizados** para consultas rápidas
-- **Relaciones Many-to-Many** para autores y etiquetas
+- **Metadatos v2**: Tabla única plana (wide table) para máxima portabilidad
 - **Función almacenada** `buscar_recursos()` para búsqueda compleja
 
 📖 **[Ver documentación completa de BD →](docs/DATABASE.md)**

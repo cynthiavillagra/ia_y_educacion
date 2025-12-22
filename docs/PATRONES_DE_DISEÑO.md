@@ -282,28 +282,19 @@ def to_material(row: dict, autores: list, etiquetas: list) -> Material:
 **Archivo**: [`adapters/material_adapter.py`](file:///c:/Users/Cynthia/OneDrive/Escritorio/EDUCACION/SAIA/ia_y_educacion/adapters/material_adapter.py)
 
 ```python
-def to_material(row: dict, autores: list, etiquetas: list) -> Material:
     """
     Adapta datos crudos de PostgreSQL al modelo de dominio.
-    
-    Si mañana renombramos 'año_publicacion' a 'publication_year' en la DB,
-    solo cambiamos esta función. El resto del código sigue usando
-    material.anio_publicacion sin enterarse.
     """
     return Material(
         id=row.get("id"),
         titulo=row.get("titulo"),
-        resumen=row.get("resumen"),
-        anio_publicacion=row.get("año_publicacion"),  # ← Mapeo explícito
-        fecha_ingreso=row.get("fecha_ingreso"),
-        estado_alojamiento=row.get("estado_alojamiento"),
-        url_descarga=row.get("url_descarga"),
-        licencia_cc=row.get("licencia_cc"),
-        tipo_documento=row.get("tipo_documento"),
-        codigo_documento=row.get("codigo_documento"),
-        coleccion=row.get("coleccion"),
-        autores=autores,
-        etiquetas=etiquetas
+        descripcion_resumen=row.get("descripcion_resumen"),
+        anio_publicacion=row.get("anio_publicacion"),
+        autores=row.get("autores"), # Ahora es un string directo en v2
+        institucion_fuente=row.get("institucion_fuente"),
+        tipo_recurso=row.get("tipo_recurso"),
+        # ... resto de campos v2
+        palabras_clave=row.get("palabras_clave")
     )
 ```
 
