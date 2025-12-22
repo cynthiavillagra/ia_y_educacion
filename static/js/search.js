@@ -75,47 +75,38 @@ function cardTemplate(item) {
   const resumen = (item.descripcion_resumen || item.resumen || '').slice(0, 240)
   const isClipped = (item.descripcion_resumen || item.resumen || '').length > 240
 
-  // Icon based on type
   const typeMap = {
     'paper_academico': '📄', 'libro': '📘', 'informe': '📊', 'video': '🎥', 'default': '📎'
   }
   const icon = typeMap[item.tipo_recurso] || typeMap.default
 
   return `
-    <article class="flex flex-col sm:flex-row gap-4 p-5 bg-white border border-gray-200 rounded-lg hover:shadow-md transition-shadow group">
-      <!-- Icon/Type Indicator (Mobile hidden or small) -->
-      <div class="hidden sm:flex flex-col items-center justify-start pt-1 min-w-[3rem] text-3xl opacity-50 select-none">
-        ${icon}
-      </div>
-
-      <div class="flex-grow">
-        <div class="flex flex-col-reverse sm:flex-row sm:justify-between sm:items-start gap-2 mb-1">
-          <h3 class="text-xl font-serif font-semibold text-primary-700 group-hover:text-primary-900 leading-tight">
-            <a href="./detalle.html?id=${encodeURIComponent(item.id)}" class="hover:underline">${item.titulo || 'Sin Título'}</a>
-          </h3>
-          <span class="inline-flex items-center px-2.5 py-0.5 rounded text-xs font-medium bg-slate-100 text-slate-600 whitespace-nowrap uppercase tracking-wider">
+    <article class="article-card">
+      <div class="article-icon">${icon}</div>
+      <div class="article-content">
+        <div class="article-header">
+          <a class="article-title" href="./detalle.html?id=${encodeURIComponent(item.id)}">
+            ${item.titulo || 'Sin Título'}
+          </a>
+          <span class="article-type">
             ${item.tipo_recurso ? item.tipo_recurso.replace('_', ' ') : 'Recurso'}
           </span>
         </div>
 
-        <div class="text-sm text-green-700 font-medium mb-2">
+        <div class="article-meta">
           ${autores.join('; ') || 'Autor desconocido'} 
-          <span class="text-slate-400 mx-1">•</span> 
-          <span class="text-slate-600">${item.anio_publicacion || 's.f.'}</span>
-          <span class="text-slate-400 mx-1">•</span>
-          <span class="text-slate-600 italic">${item.institucion_fuente || item.coleccion || 'Fuente desconocida'}</span>
+          <span class="meta-sep">•</span> 
+          <span>${item.anio_publicacion || 's.f.'}</span>
+          <span class="meta-sep">•</span>
+          <span class="meta-source">${item.institucion_fuente || item.coleccion || 'Fuente desconocida'}</span>
         </div>
 
-        <p class="text-sm text-slate-600 mb-3 leading-relaxed">
+        <p class="article-abstract">
           ${resumen}${isClipped ? '...' : ''}
         </p>
 
-        <div class="flex flex-wrap items-center gap-2 mt-auto">
-          ${etiquetas.slice(0, 4).map(t => `
-            <span class="inline-flex items-center px-2 py-1 rounded text-xs text-slate-600 bg-slate-50 border border-slate-200">
-              ${t}
-            </span>
-          `).join('')}
+        <div class="article-tags">
+          ${etiquetas.slice(0, 4).map(t => `<span class="tag">${t}</span>`).join('')}
         </div>
       </div>
     </article>
