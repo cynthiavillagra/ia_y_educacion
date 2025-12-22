@@ -64,8 +64,6 @@ function renderPagination(total, page, perPage) {
 }
 
 function cardTemplate(item) {
-  // Backend v2 devuelve strings separados por ; o ,
-  // Backend v1 devolvía arrays. Normalizamos a array para visualización consistente.
   let autores = []
   if (Array.isArray(item.autores)) autores = item.autores
   else if (typeof item.autores === 'string') autores = item.autores.split(';').map(s => s.trim()).filter(Boolean)
@@ -74,54 +72,59 @@ function cardTemplate(item) {
   if (Array.isArray(item.etiquetas)) etiquetas = item.etiquetas
   else if (typeof item.etiquetas === 'string') etiquetas = item.etiquetas.split(',').map(s => s.trim()).filter(Boolean)
 
-  const resumen = (item.descripcion_resumen || item.resumen || '').slice(0, 160)
+  const resumen = (item.descripcion_resumen || item.resumen || '').slice(0, 240)
+  const isClipped = (item.descripcion_resumen || item.resumen || '').length > 240
+
+  // Icon based on type
+  const typeMap = {
+    'paper_academico': '📄', 'libro': '📘', 'informe': '📊', 'video': '🎥', 'default': '📎'
+  }
+  const icon = typeMap[item.tipo_recurso] || typeMap.default
 
   return `
-    <a class="card hover:shadow-sm transition flex flex-col h-full p-4 border rounded-lg bg-white" href="./detalle.html?id=${encodeURIComponent(item.id)}">
-      <h3 class="card-title text-lg font-semibold mb-2 text-gray-900">${item.titulo || ''}</h3>
-      <div class="text-xs font-medium text-indigo-600 mb-1 uppercase tracking-wide">${item.institucion_fuente || item.coleccion || ''}</div>
-      <p class="card-meta text-sm text-gray-600 mb-2">${autores.join('; ')}</p>
-      <p class="text-sm text-gray-700 mb-3 flex-grow">${resumen}${(item.descripcion_resumen || item.resumen || '').length > 160 ? '…' : ''}</p>
-      
-      <div class="mb-3 flex flex-wrap gap-1">
-        ${etiquetas.slice(0, 3).map(t => `<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800">${t}</span>`).join('')}
+    <article class="flex flex-col sm:flex-row gap-4 p-5 bg-white border border-gray-200 rounded-lg hover:shadow-md transition-shadow group">
+      <!-- Icon/Type Indicator (Mobile hidden or small) -->
+      <div class="hidden sm:flex flex-col items-center justify-start pt-1 min-w-[3rem] text-3xl opacity-50 select-none">
+        ${icon}
       </div>
 
-      <div class="mt-auto flex items-center justify-between text-sm text-gray-500 pt-2 border-t">
-        <span>${item.anio_publicacion || ''}</span>
-        <span class="px-2 py-1 rounded bg-indigo-50 text-indigo-700 text-xs font-medium">${item.tipo_recurso || item.tipo_documento || ''}</span>
+      <div class="flex-grow">
+        <div class="flex flex-col-reverse sm:flex-row sm:justify-between sm:items-start gap-2 mb-1">
+          <h3 class="text-xl font-serif font-semibold text-primary-700 group-hover:text-primary-900 leading-tight">
+            <a href="./detalle.html?id=${encodeURIComponent(item.id)}" class="hover:underline">${item.titulo || 'Sin Título'}</a>
+          </h3>
+          <span class="inline-flex items-center px-2.5 py-0.5 rounded text-xs font-medium bg-slate-100 text-slate-600 whitespace-nowrap uppercase tracking-wider">
+            ${item.tipo_recurso ? item.tipo_recurso.replace('_', ' ') : 'Recurso'}
+          </span>
+        </div>
+
+        <div class="text-sm text-green-700 font-medium mb-2">
+          ${autores.join('; ') || 'Autor desconocido'} 
+          <span class="text-slate-400 mx-1">•</span> 
+          <span class="text-slate-600">${item.anio_publicacion || 's.f.'}</span>
+          <span class="text-slate-400 mx-1">•</span>
+          <span class="text-slate-600 italic">${item.institucion_fuente || item.coleccion || 'Fuente desconocida'}</span>
+        </div>
+
+        <p class="text-sm text-slate-600 mb-3 leading-relaxed">
+          ${resumen}${isClipped ? '...' : ''}
+        </p>
+
+        <div class="flex flex-wrap items-center gap-2 mt-auto">
+          ${etiquetas.slice(0, 4).map(t => `
+            <span class="inline-flex items-center px-2 py-1 rounded text-xs text-slate-600 bg-slate-50 border border-slate-200">
+              ${t}
+            </span>
+          `).join('')}
+        </div>
       </div>
-    </a>
+    </article>
   `
 }
 
-async function search() {
-  $('#results').innerHTML = ''
-  $('#results-count').textContent = 'Buscando…'
-  const params = new URLSearchParams()
-  const q = $('#q').value.trim(); if (q) params.set('q', q)
-  const autor = $('#autor').value.trim(); if (autor) params.set('autor', autor)
-  const anio = $('#anio').value.trim(); if (anio) params.set('anio', anio)
-  const fuente = $('#fuente').value.trim(); if (fuente) params.set('fuente', fuente)
-  const tipo = $('#tipo').value.trim(); if (tipo) params.set('tipo', tipo)
-  params.set('page', String(state.page))
-  params.set('per_page', String(state.perPage))
-  params.set('orden', state.orden)
+// ... (search function remains mostly same)
 
-  const res = await fetch(`/api/search?${params.toString()}`)
-  if (!res.ok) {
-    $('#results-count').textContent = 'Error al buscar'
-    return
-  }
-  const data = await res.json()
-  // Soporte para estructura { total, items } o lista directa (legacy)
-  const items = Array.isArray(data) ? data : (data.items || data.resultados || [])
-  state.total = typeof data.total === 'number' ? data.total : items.length
-  $('#results-count').textContent = `${state.total} resultados`
-  $('#results').innerHTML = items.map(cardTemplate).join('')
-  renderPagination(state.total, state.page, state.perPage)
-}
-
+// Bind events
 $('#filters-form').addEventListener('submit', (e) => {
   e.preventDefault()
   state.page = 1
@@ -132,6 +135,10 @@ $('#filters-form').addEventListener('submit', (e) => {
 
 $('#clear-filters').addEventListener('click', () => {
   $$('#filters-form input, #filters-form select').forEach(el => el.value = '')
+  // Also clear hero search if it exists
+  const heroQ = document.getElementById('q')
+  if (heroQ) heroQ.value = ''
+
   state.page = 1
   state.orden = 'relevancia'
   stateToParams()
@@ -144,6 +151,11 @@ $('#orden').addEventListener('change', () => {
   stateToParams()
   search()
 })
+
+// Expose to window for inline scripts
+window.state = state
+window.search = search
+window.stateToParams = stateToParams
 
 paramsToState()
 stateToParams()

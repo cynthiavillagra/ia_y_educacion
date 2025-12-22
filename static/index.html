@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="es">
+<html lang="es" class="scroll-smooth">
 
 <head>
   <meta charset="utf-8">
@@ -7,52 +7,146 @@
   <title>Repositorio IA y Educación</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Merriweather:ital,wght@0,400;0,700;1,400&display=swap"
+    rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="./css/styles.css">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            serif: ['Merriweather', 'serif'],
+          },
+          colors: {
+            primary: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              600: '#4f46e5',
+              700: '#4338ca',
+              800: '#3730a3',
+              900: '#312e81',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    /* Custom scrollbar for sidebar */
+    .scrollbar-thin::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .scrollbar-thin::-webkit-scrollbar-thumb {
+      background-color: #cbd5e1;
+      border-radius: 3px;
+    }
+
+    .scrollbar-thin::-webkit-scrollbar-track {
+      background-color: transparent;
+    }
+  </style>
 </head>
 
-<body class="min-h-screen bg-gray-50 text-gray-900"
-  style="font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif">
-  <header class="bg-white border-b">
-    <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-      <a href="./index.html" class="text-xl font-semibold">Repositorio Digital · IA y Educación</a>
-      <nav id="header-nav" class="flex items-center gap-4 text-sm">
-        <a href="./admin/login.html" class="text-gray-600 hover:text-gray-900">Administración</a>
-      </nav>
+<body class="bg-gray-50 text-slate-800 font-sans min-h-screen flex flex-col">
+
+  <!-- Navbar -->
+  <header class="bg-white border-b border-gray-200 sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between h-16 items-center">
+        <a href="./index.html" class="flex items-center gap-3 group">
+          <div
+            class="bg-primary-600 text-white w-8 h-8 rounded-lg flex items-center justify-center font-bold text-lg group-hover:bg-primary-700 transition">
+            R</div>
+          <span class="text-lg font-semibold tracking-tight text-slate-900 group-hover:text-primary-700 transition">IA y
+            Educación</span>
+        </a>
+        <nav id="header-nav" class="flex items-center gap-6 text-sm font-medium">
+          <a href="./admin/login.html" class="text-slate-500 hover:text-primary-700 transition">Administración</a>
+        </nav>
+      </div>
     </div>
   </header>
 
-  <main class="max-w-7xl mx-auto px-4 py-8">
-    <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
-      <aside class="lg:col-span-1 bg-white border rounded-lg p-4 h-fit">
-        <h2 class="text-lg font-semibold mb-4">Filtros</h2>
-        <form id="filters-form" class="space-y-4">
-          <div>
-            <label class="block text-sm font-medium mb-1" for="q">Búsqueda</label>
-            <input id="q" name="q" type="search" placeholder="Título, autor, etiqueta, resumen"
-              class="w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500">
+  <!-- Hero Search Section -->
+  <div class="bg-slate-900 text-white py-16 px-4 relative overflow-hidden">
+    <!-- Abstract Pattern Background -->
+    <div
+      class="absolute inset-0 opacity-10 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-indigo-500 via-slate-900 to-black">
+    </div>
+
+    <div class="max-w-4xl mx-auto relative z-10 text-center">
+      <h1 class="text-3xl md:text-4xl font-serif font-bold mb-4 tracking-tight">Repositorio de Recursos Educativos</h1>
+      <p class="text-slate-300 mb-8 text-lg max-w-2xl mx-auto font-light">Explora documentos, investigaciones y
+        herramientas sobre Inteligencia Artificial aplicada a la educación.</p>
+
+      <!-- Main Search Form -->
+      <form id="hero-search-form" class="relative max-w-2xl mx-auto group">
+        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+          <svg class="h-6 w-6 text-gray-400 group-focus-within:text-primary-600 transition" fill="none"
+            viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+        </div>
+        <input id="q" type="search"
+          class="block w-full pl-12 pr-4 py-4 rounded-xl border-0 shadow-lg text-gray-900 placeholder:text-gray-400 focus:ring-4 focus:ring-primary-600/30 sm:text-lg"
+          placeholder="Buscar por título, autor, palabras clave o resumen...">
+        <div class="absolute inset-y-0 right-2 flex items-center">
+          <button type="submit"
+            class="bg-primary-600 hover:bg-primary-700 text-white px-6 py-2 rounded-lg font-medium transition shadow-sm">
+            Buscar
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Main Content: Sidebar + Results -->
+  <main class="flex-grow max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 grid grid-cols-1 lg:grid-cols-12 gap-8">
+
+    <!-- Sidebar Filters -->
+    <aside class="lg:col-span-3">
+      <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden sticky top-24">
+        <div class="p-4 border-b border-gray-100 bg-gray-50 flex justify-between items-center">
+          <h2 class="font-semibold text-slate-900">Filtros</h2>
+          <button id="clear-filters" class="text-xs text-primary-600 hover:text-primary-800 font-medium">Limpiar
+            todo</button>
+        </div>
+
+        <form id="filters-form" class="p-4 space-y-6 max-h-[calc(100vh-200px)] overflow-y-auto scrollbar-thin">
+
+          <!-- Fuente -->
+          <div class="space-y-2">
+            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider" for="fuente">Institución
+              Fuente</label>
+            <input id="fuente" name="fuente" type="text" placeholder="Ej: UNAM, MIT..."
+              class="w-full rounded-md border-gray-300 focus:border-primary-500 focus:ring-primary-500 text-sm">
           </div>
-          <div>
-            <label class="block text-sm font-medium mb-1" for="autor">Autor</label>
-            <input id="autor" name="autor" type="text"
-              class="w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500">
+
+          <!-- Autor -->
+          <div class="space-y-2">
+            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider" for="autor">Autoría</label>
+            <input id="autor" name="autor" type="text" placeholder="Apellido..."
+              class="w-full rounded-md border-gray-300 focus:border-primary-500 focus:ring-primary-500 text-sm">
           </div>
-          <div>
-            <label class="block text-sm font-medium mb-1" for="anio">Año de publicación</label>
-            <input id="anio" name="anio" type="number" min="1900" max="2100"
-              class="w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500">
+
+          <!-- Año -->
+          <div class="space-y-2">
+            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider" for="anio">Año</label>
+            <input id="anio" name="anio" type="number" min="1900" max="2100" placeholder="Ej: 2024"
+              class="w-full rounded-md border-gray-300 focus:border-primary-500 focus:ring-primary-500 text-sm">
           </div>
-          <div>
-            <label class="block text-sm font-medium mb-1" for="fuente">Institución Fuente</label>
-            <input id="fuente" name="fuente" type="text"
-              class="w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500">
-          </div>
-          <div>
-            <label class="block text-sm font-medium mb-1" for="tipo">Tipo de recurso</label>
+
+          <!-- Tipo -->
+          <div class="space-y-2">
+            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider" for="tipo">Tipo de
+              Recurso</label>
             <select id="tipo" name="tipo"
-              class="w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500">
-              <option value="">Todos</option>
+              class="w-full rounded-md border-gray-300 focus:border-primary-500 focus:ring-primary-500 text-sm">
+              <option value="">Todos los tipos</option>
               <option value="paper_academico">Paper Académico</option>
               <option value="libro">Libro</option>
               <option value="capitulo_libro">Capítulo de Libro</option>
@@ -68,63 +162,103 @@
               <option value="presentacion">Presentación</option>
             </select>
           </div>
-          <div class="flex gap-2">
-            <button id="apply-filters" type="submit"
-              class="inline-flex items-center justify-center px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">Aplicar</button>
-            <button id="clear-filters" type="button"
-              class="inline-flex items-center justify-center px-4 py-2 bg-gray-100 text-gray-900 rounded-md hover:bg-gray-200">Limpiar</button>
-          </div>
+
+          <button type="submit"
+            class="w-full bg-slate-800 text-white rounded-md py-2 text-sm font-medium hover:bg-slate-900 transition mt-4">
+            Aplicar Filtros
+          </button>
         </form>
-      </aside>
+      </div>
+    </aside>
 
-      <section class="lg:col-span-3">
-        <div class="flex items-end justify-between mb-4">
-          <p id="results-count" class="text-sm text-gray-600">0 resultados</p>
-          <div class="flex items-center gap-2">
-            <label for="orden" class="text-sm text-gray-600">Ordenar por</label>
-            <select id="orden" class="rounded-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 text-sm">
-              <option value="relevancia">Relevancia</option>
-              <option value="anio_desc">Año (desc)</option>
-              <option value="anio_asc">Año (asc)</option>
-              <option value="fecha_ingreso_desc">Fecha de ingreso (desc)</option>
-            </select>
-          </div>
+    <!-- Results Area -->
+    <section class="lg:col-span-9 space-y-6">
+      <!-- Toolbar -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-gray-200">
+        <p id="results-count" class="text-lg font-serif font-bold text-slate-900">Cargando...</p>
+
+        <div class="flex items-center gap-3">
+          <label for="orden" class="text-sm text-slate-600 font-medium">Ordenar:</label>
+          <select id="orden"
+            class="rounded-md border-gray-300 focus:border-primary-500 focus:ring-primary-500 text-sm py-1.5 pl-3 pr-8">
+            <option value="relevancia">Relevancia</option>
+            <option value="recientes">Recientes</option>
+            <option value="anio_desc">Año (Desc)</option>
+            <option value="anio_asc">Año (Asc)</option>
+          </select>
         </div>
+      </div>
 
-        <div id="results" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"></div>
+      <!-- Results Grid (Now mapped to List view via JS or Grid if kept) -->
+      <!-- We keep the ID 'results'. The JS cardTemplate controls the inner look. 
+           For a "Professional" look, we might want a simple column layout. -->
+      <div id="results" class="grid grid-cols-1 gap-4">
+        <!-- JS injects cards here -->
+      </div>
 
-        <div id="pagination" class="mt-8 flex items-center justify-center gap-2"></div>
-      </section>
-    </div>
+      <div id="pagination" class="pt-8 flex items-center justify-center gap-2"></div>
+    </section>
+
   </main>
 
-  <footer class="bg-white border-t">
-    <div class="max-w-7xl mx-auto px-4 py-6 text-sm flex flex-col sm:flex-row items-center justify-between gap-3">
-      <p class="text-gray-600">Repositorio Digital de Acceso Abierto sobre IA y Educación</p>
-      <p class="text-gray-600">Contenido bajo licencias Creative Commons según cada recurso</p>
+  <footer class="bg-white border-t border-gray-200 mt-auto">
+    <div class="max-w-7xl mx-auto px-4 py-8 flex flex-col md:flex-row justify-between items-center gap-4">
+      <div class="text-sm text-slate-500">
+        <p class="font-semibold text-slate-900">Repositorio Digital de Acceso Abierto</p>
+        <p>Inteligencia Artificial y Educación</p>
+      </div>
+      <div class="flex items-center gap-4 text-sm text-slate-500">
+        <a href="#" class="hover:text-primary-700 transition">Política de Privacidad</a>
+        <span>·</span>
+        <a href="#" class="hover:text-primary-700 transition">Términos de Uso</a>
+        <span>·</span>
+        <a href="#" class="hover:text-primary-700 transition">Licencias CC</a>
+      </div>
     </div>
   </footer>
 
-
   <script>
-    // Check if user is logged in and update header navigation
-    (function () {
-      const token = localStorage.getItem('sb_access_token')
-      const nav = document.getElementById('header-nav')
-      if (token && nav) {
-        nav.innerHTML = `
-          <a href="./admin/ingestion.html" class="text-gray-600 hover:text-indigo-600 font-medium transition-colors">Nuevo Recurso</a>
-          <button id="home-logout" class="text-red-600 hover:text-red-800 font-medium transition-colors">Cerrar sesión</button>
+      // Authentication State
+      (function () {
+        const token = localStorage.getItem('sb_access_token')
+        const nav = document.getElementById('header-nav')
+        if (token && nav) {
+          nav.innerHTML = `
+          <a href="./admin/ingestion.html" class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-primary-50 text-primary-700 font-medium hover:bg-primary-100 transition">
+            <span>+ Nuevo</span>
+          </a>
+          <button id="home-logout" class="text-slate-500 hover:text-red-600 font-medium transition-colors">Salir</button>
         `
-        const logoutBtn = document.getElementById('home-logout')
-        if (logoutBtn) {
-          logoutBtn.addEventListener('click', () => {
-            localStorage.removeItem('sb_access_token')
-            location.reload()
-          })
+          const logoutBtn = document.getElementById('home-logout')
+          if (logoutBtn) {
+            logoutBtn.addEventListener('click', () => {
+              localStorage.removeItem('sb_access_token')
+              location.reload()
+            })
+          }
         }
+      })();
+
+    // Bind Hero Search to Search Logic
+    // search.js loads after this and exposes 'stateToParams' and 'search'.
+    document.addEventListener('DOMContentLoaded', () => {
+      const heroForm = document.getElementById('hero-search-form');
+      if (heroForm) {
+        heroForm.addEventListener('submit', (e) => {
+          e.preventDefault();
+          // Ensure state is updated from DOM inputs
+          // Since search.js might not have run search() yet if we are fast, or functions might not be ready.
+          // But JS is usually sequential.
+          if (window.state && window.search && window.stateToParams) {
+            window.state.page = 1;
+            // Note: 'search.js' reads values from DOM. 
+            // #q is input.
+            window.stateToParams();
+            window.search();
+          }
+        });
       }
-    })()
+    });
   </script>
   <script src="js/sanitizer.js"></script>
   <script src="./js/search.js"></script>
