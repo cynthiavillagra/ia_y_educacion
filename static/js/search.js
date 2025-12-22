@@ -1,100 +1,132 @@
-const $ = (s, d = document) => d.querySelector(s)
-const $$ = (s, d = document) => Array.from(d.querySelectorAll(s))
+/**
+ * search.js
+ * Lógica completa para búsqueda, filtrado y paginación en el frontend.
+ * Se conecta a la API V2 (/api/search -> handle_list_materials).
+ */
 
+const $ = (selector) => document.querySelector(selector)
+const $$ = (selector) => Array.from(document.querySelectorAll(selector))
+
+// Estado global de la búsqueda
 const state = {
   page: 1,
   perPage: 20,
   total: 0,
   orden: 'relevancia',
+  q: '',
+  autor: '',
+  anio: '',
+  fuente: '',
+  tipo: ''
 }
 
+/**
+ * Inicializa el estado leyendo la URL actual.
+ */
 function paramsToState() {
-  const url = new URL(location.href)
-  const p = url.searchParams
-  $('#q').value = p.get('q') || ''
-  $('#autor').value = p.get('autor') || ''
-  $('#anio').value = p.get('anio') || ''
-  $('#fuente').value = p.get('fuente') || ''
-  $('#tipo').value = p.get('tipo') || ''
-  state.page = parseInt(p.get('page') || '1', 10)
-  state.orden = p.get('orden') || 'relevancia'
-  $('#orden').value = state.orden
+  const params = new URLSearchParams(location.search)
+  state.q = params.get('q') || ''
+  state.autor = params.get('autor') || ''
+  state.anio = params.get('anio') || ''
+  state.fuente = params.get('fuente') || ''
+  state.tipo = params.get('tipo') || ''
+  state.page = parseInt(params.get('page') || '1', 10)
+  state.orden = params.get('orden') || 'relevancia'
+
+  // Sincronizar inputs del DOM
+  if ($('#q')) $('#q').value = state.q
+  if ($('#autor')) $('#autor').value = state.autor
+  if ($('#anio')) $('#anio').value = state.anio
+  if ($('#fuente')) $('#fuente').value = state.fuente
+  if ($('#tipo')) $('#tipo').value = state.tipo
+  if ($('#orden')) $('#orden').value = state.orden
 }
 
+/**
+ * Actualiza la URL con el estado actual (sin recargar).
+ */
 function stateToParams() {
   const url = new URL(location.href)
   const p = url.searchParams
-  p.set('page', String(state.page))
-  // Mapear orden frontend -> backend v2
-  // 'fecha_ingreso' ahora es 'fecha_incorporacion_repo' en DB, pero el handler puede manejar alias o usamos el nombre nuevo en el select.
-  // El handler ya usa el valor directamente, así que aseguramos que el HTML tenga los values correctos o el handler haga el map.
-  // Por ahora mantenemos los valores del select HTML ('relevancia', 'anio_desc', 'fecha_ingreso_desc')
-  // y dejamos que el backend decida si necesita adaptación.
+
+  // Actualizar estado desde inputs por si acaso cambio algo sin submit
+  // (aunque idealmente usamos el submit del form)
+
+  if (state.q) p.set('q', state.q); else p.delete('q')
+  if (state.autor) p.set('autor', state.autor); else p.delete('autor')
+  if (state.anio) p.set('anio', state.anio); else p.delete('anio')
+  if (state.fuente) p.set('fuente', state.fuente); else p.delete('fuente')
+  if (state.tipo) p.set('tipo', state.tipo); else p.delete('tipo')
+
+  p.set('page', state.page.toString())
   p.set('orden', state.orden)
-  const map = { q: '#q', autor: '#autor', anio: '#anio', fuente: '#fuente', tipo: '#tipo' }
-  Object.entries(map).forEach(([k, sel]) => {
-    const v = $(sel).value.trim()
-    if (v) p.set(k, v); else p.delete(k)
-  })
+
   history.replaceState(null, '', url.toString())
 }
 
-function renderPagination(total, page, perPage) {
-  const totalPages = Math.max(1, Math.ceil(total / perPage))
-  const c = $('#pagination')
-  c.innerHTML = ''
-  const btn = (label, target, disabled = false) => {
-    const a = document.createElement('button')
-    a.type = 'button'
-    a.textContent = label
-    a.className = `px-3 py-1.5 rounded-md text-sm ${disabled ? 'bg-gray-100 text-gray-400' : 'bg-white border hover:bg-gray-50'}`
-    if (!disabled) a.addEventListener('click', () => { state.page = target; stateToParams(); search() })
-    return a
-  }
-  c.append(btn('Anterior', Math.max(1, page - 1), page <= 1))
-  const windowSize = 5
-  const start = Math.max(1, page - Math.floor(windowSize / 2))
-  const end = Math.min(totalPages, start + windowSize - 1)
-  for (let i = start; i <= end; i++) {
-    const b = btn(String(i), i, false)
-    if (i === page) b.className = 'px-3 py-1.5 rounded-md text-sm bg-indigo-600 text-white'
-    c.append(b)
-  }
-  c.append(btn('Siguiente', Math.min(totalPages, page + 1), page >= totalPages))
-}
-
+/**
+ * Genera el HTML de una tarjeta de recurso.
+ */
 function cardTemplate(item) {
-  let autores = []
-  if (Array.isArray(item.autores)) autores = item.autores
-  else if (typeof item.autores === 'string') autores = item.autores.split(';').map(s => s.trim()).filter(Boolean)
-
-  let etiquetas = []
-  if (Array.isArray(item.etiquetas)) etiquetas = item.etiquetas
-  else if (typeof item.etiquetas === 'string') etiquetas = item.etiquetas.split(',').map(s => s.trim()).filter(Boolean)
-
-  const resumen = (item.descripcion_resumen || item.resumen || '').slice(0, 240)
-  const isClipped = (item.descripcion_resumen || item.resumen || '').length > 240
-
-  const typeMap = {
-    'paper_academico': '📄', 'libro': '📘', 'informe': '📊', 'video': '🎥', 'default': '📎'
+  // Manejo robusto de autores (puede ser array de legacy o string de V2)
+  let autoresArr = []
+  if (Array.isArray(item.autores)) {
+    autoresArr = item.autores
+  } else if (typeof item.autores === 'string') {
+    autoresArr = item.autores.split(';').map(s => s.trim()).filter(Boolean)
   }
-  const icon = typeMap[item.tipo_recurso] || typeMap.default
+
+  // Manejo de etiquetas
+  let tagsArr = []
+  if (Array.isArray(item.etiquetas)) {
+    tagsArr = item.etiquetas
+  } else if (typeof item.etiquetas === 'string') {
+    tagsArr = item.etiquetas.split(',').map(s => s.trim()).filter(Boolean)
+  }
+
+  // Resumen / Descripción
+  // Backend V2 usa 'descripcion_resumen', backup con 'resumen'
+  const textBody = item.descripcion_resumen || item.resumen || ''
+  const resumen = textBody.slice(0, 240)
+  const isClipped = textBody.length > 240
+
+  // Íconos por tipo
+  const typeMap = {
+    'paper_academico': '📄',
+    'libro': '📘',
+    'capitulo_libro': '🔖',
+    'informe': '📊',
+    'guia': '🧭',
+    'normativa': '⚖️',
+    'diseno_curricular': '🎓',
+    'articulo_web': '🌐',
+    'web_institucional': '🏫',
+    'material_docente': '👩‍🏫',
+    'video': '🎥',
+    'dataset': '💾',
+    'presentacion': '📽️',
+    'boletin': '📰',
+    'default': '📎'
+  }
+  const tipoKey = item.tipo_recurso || 'default'
+  const icon = typeMap[tipoKey] || typeMap.default
+
+  // Texto del tipo (reemplazar guiones bajos)
+  const tipoLabel = tipoKey.replace(/_/g, ' ')
 
   return `
     <article class="article-card">
-      <div class="article-icon">${icon}</div>
+      <div class="article-icon" title="${tipoLabel}">${icon}</div>
       <div class="article-content">
         <div class="article-header">
           <a class="article-title" href="./detalle.html?id=${encodeURIComponent(item.id)}">
             ${item.titulo || 'Sin Título'}
           </a>
-          <span class="article-type">
-            ${item.tipo_recurso ? item.tipo_recurso.replace('_', ' ') : 'Recurso'}
-          </span>
+          <span class="article-type">${tipoLabel}</span>
         </div>
 
         <div class="article-meta">
-          ${autores.join('; ') || 'Autor desconocido'} 
+          ${autoresArr.join('; ') || 'Autor desconocido'} 
           <span class="meta-sep">•</span> 
           <span>${item.anio_publicacion || 's.f.'}</span>
           <span class="meta-sep">•</span>
@@ -106,81 +138,235 @@ function cardTemplate(item) {
         </p>
 
         <div class="article-tags">
-          ${etiquetas.slice(0, 4).map(t => `<span class="tag">${t}</span>`).join('')}
+          ${tagsArr.slice(0, 5).map(t => `<span class="tag">${t}</span>`).join('')}
         </div>
       </div>
     </article>
   `
 }
 
-async function search() {
-  $('#results').innerHTML = ''
-  $('#results-count').textContent = 'Buscando…'
-  const params = new URLSearchParams()
-  const q = $('#q').value.trim(); if (q) params.set('q', q)
-  const autor = $('#autor').value.trim(); if (autor) params.set('autor', autor)
-  const anio = $('#anio').value.trim(); if (anio) params.set('anio', anio)
-  const fuente = $('#fuente').value.trim(); if (fuente) params.set('fuente', fuente)
-  const tipo = $('#tipo').value.trim(); if (tipo) params.set('tipo', tipo)
-  params.set('page', String(state.page))
-  params.set('per_page', String(state.perPage))
-  params.set('orden', state.orden)
+/**
+ * Renderiza los botones de paginación.
+ */
+function renderPagination(total, page, perPage) {
+  const container = $('#pagination')
+  container.innerHTML = ''
 
-  const res = await fetch(`/api/search?${params.toString()}`)
-  if (!res.ok) {
-    let msg = 'Error al buscar'
-    try {
-      const errData = await res.json()
-      msg = errData.error || errData.detail || msg
-    } catch (e) {
-      try { msg = await res.text() } catch (e2) { }
+  if (total <= 0) return
+
+  const totalPages = Math.ceil(total / perPage)
+  if (totalPages <= 1) return
+
+  const createBtn = (label, pageNum, isActive, isDisabled) => {
+    const btn = document.createElement('button')
+    btn.type = 'button'
+    btn.textContent = label
+
+    if (isActive) {
+      btn.className = 'px-3 py-1.5 rounded-md text-sm bg-indigo-600 text-white border border-indigo-600'
+    } else if (isDisabled) {
+      btn.className = 'px-3 py-1.5 rounded-md text-sm bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed'
+      btn.disabled = true
+    } else {
+      btn.className = 'px-3 py-1.5 rounded-md text-sm bg-white border border-gray-300 hover:bg-gray-50 text-gray-700'
+      btn.addEventListener('click', () => {
+        state.page = pageNum
+        stateToParams()
+        search()
+      })
     }
-    console.error('API Error:', msg)
-    $('#results-count').innerHTML = `<span class="text-red-600">Error: ${msg.slice(0, 100)}</span>`
-    return
+    return btn
   }
-  const data = await res.json()
-  // Soporte para estructura { total, items } o lista directa (legacy)
-  const items = Array.isArray(data) ? data : (data.items || data.resultados || [])
-  state.total = typeof data.total === 'number' ? data.total : items.length
-  $('#results-count').textContent = `${state.total} resultados`
-  $('#results').innerHTML = items.map(cardTemplate).join('')
-  renderPagination(state.total, state.page, state.perPage)
+
+  // Botón Anterior
+  container.appendChild(createBtn('Anterior', page - 1, false, page === 1))
+
+  // Ventana de páginas (ej: 1 .. 4 5 6 .. 10)
+  const windowSize = 5
+  let start = Math.max(1, page - Math.floor(windowSize / 2))
+  let end = Math.min(totalPages, start + windowSize - 1)
+
+  if (end - start + 1 < windowSize) {
+    start = Math.max(1, end - windowSize + 1)
+  }
+
+  for (let i = start; i <= end; i++) {
+    container.appendChild(createBtn(i.toString(), i, i === page, false))
+  }
+
+  // Botón Siguiente
+  container.appendChild(createBtn('Siguiente', page + 1, false, page === totalPages))
 }
 
-// Bind events
-$('#filters-form').addEventListener('submit', (e) => {
-  e.preventDefault()
-  state.page = 1
-  state.orden = $('#orden').value
-  stateToParams()
+/**
+ * Ejecuta la búsqueda contra la API.
+ */
+async function search() {
+  const container = $('#results')
+  const countLabel = $('#results-count')
+
+  // Feedback visual inmediato
+  container.style.opacity = '0.5'
+  countLabel.textContent = 'Buscando...'
+
+  try {
+    // Construir Query Params para fetch
+    const params = new URLSearchParams()
+    if (state.q) params.set('q', state.q)
+    if (state.autor) params.set('autor', state.autor)
+    if (state.anio) params.set('anio', state.anio)
+    if (state.fuente) params.set('fuente', state.fuente)
+    if (state.tipo) params.set('tipo', state.tipo)
+
+    params.set('page', state.page)
+    params.set('per_page', state.perPage)
+    params.set('orden', state.orden)
+
+    // Llamada API
+    // IMPORTANTE: Ahora apunta a /api/search que debe ser manejado por el handler V2 en index.py
+    const res = await fetch(`/api/search?${params.toString()}`)
+
+    if (!res.ok) {
+      // Intento leer error detallado
+      let errorMsg = `Error ${res.status}`
+      try {
+        const errJson = await res.json()
+        if (errJson.error) errorMsg = errJson.error
+        else if (errJson.detail) errorMsg = errJson.detail
+      } catch (e) {
+        // Si no es JSON, texto plano?
+        const text = await res.text()
+        if (text) errorMsg = text.slice(0, 500)
+      }
+      throw new Error(errorMsg)
+    }
+
+    const data = await res.json()
+
+    // Normalizar respuesta (acepta {items: [], total: N} o array directo)
+    let items = []
+    let total = 0
+
+    if (Array.isArray(data)) {
+      items = data
+      total = data.length
+    } else {
+      items = data.items || data.resultados || []
+      total = typeof data.total === 'number' ? data.total : items.length
+    }
+
+    state.total = total
+
+    // Renderizar
+    countLabel.textContent = `${total} resultados encontrados`
+
+    if (items.length === 0) {
+      container.innerHTML = `
+        <div class="text-center py-12 text-gray-500">
+          <p class="text-lg">No se encontraron resultados.</p>
+          <p class="text-sm">Intenta con otros términos o filtros.</p>
+        </div>
+      `
+    } else {
+      container.innerHTML = items.map(cardTemplate).join('')
+    }
+
+    renderPagination(total, state.page, state.perPage)
+
+  } catch (error) {
+    console.error('Search ERROR:', error)
+    countLabel.innerHTML = `<span class="text-red-600 font-bold">Error: ${error.message}</span>`
+    container.innerHTML = ''
+  } finally {
+    container.style.opacity = '1'
+  }
+}
+
+// -------------------------------------------------------------
+// EVENT LISTENERS
+// -------------------------------------------------------------
+
+document.addEventListener('DOMContentLoaded', () => {
+
+  // 1. Inicializar desde URL
+  paramsToState()
+
+  // 2. Formulario de Filtros Sidebar
+  const filtersForm = $('#filters-form')
+  if (filtersForm) {
+    filtersForm.addEventListener('submit', (e) => {
+      e.preventDefault()
+      // Actualizar estado desde inputs
+      state.fuente = $('#fuente').value.trim()
+      state.autor = $('#autor').value.trim()
+      state.anio = $('#anio').value.trim()
+      state.tipo = $('#tipo').value.trim()
+
+      // Reset a página 1 al filtrar
+      state.page = 1
+
+      stateToParams()
+      search()
+
+      // Scroll top en móvil
+      if (window.innerWidth < 1024) {
+        $('#results').scrollIntoView({ behavior: 'smooth' })
+      }
+    })
+  }
+
+  // 3. Botón Limpiar
+  const clearBtn = $('#clear-filters')
+  if (clearBtn) {
+    clearBtn.addEventListener('click', () => {
+      // Limpiar inputs visuales
+      $$('#filters-form input').forEach(i => i.value = '')
+      $$('#filters-form select').forEach(s => s.value = '')
+      const heroSearch = $('#q')
+      if (heroSearch) heroSearch.value = ''
+
+      // Limpiar estado
+      state.q = ''
+      state.autor = ''
+      state.anio = ''
+      state.fuente = ''
+      state.tipo = ''
+      state.page = 1
+      state.orden = 'relevancia'
+
+      // Reset Select orden visual
+      const sortSelect = $('#orden')
+      if (sortSelect) sortSelect.value = 'relevancia'
+
+      stateToParams()
+      search()
+    })
+  }
+
+  // 4. Ordenamiento
+  const sortSelect = $('#orden')
+  if (sortSelect) {
+    sortSelect.addEventListener('change', () => {
+      state.orden = sortSelect.value
+      state.page = 1 // Reset page on sort change? Generalmente sí.
+      stateToParams()
+      search()
+    })
+  }
+
+  // 5. Exponer búsqueda globalmente para el form del Hero (si está en otro scope)
+  window.search = search
+  window.state = state
+  window.stateToParams = stateToParams
+
+  // Si el usuario llega con URL limpia, hacemos búsqueda inicial
   search()
 })
 
-$('#clear-filters').addEventListener('click', () => {
-  $$('#filters-form input, #filters-form select').forEach(el => el.value = '')
-  // Also clear hero search if it exists
-  const heroQ = document.getElementById('q')
-  if (heroQ) heroQ.value = ''
-
+// Fix para el Hero Search que está fuera del sidebar
+// (El script inline en index.html llama a window.search)
+// Aseguramos que actualice state.q antes de llamar
+window.updateSearchQuery = (val) => {
+  state.q = val
   state.page = 1
-  state.orden = 'relevancia'
-  stateToParams()
-  search()
-})
-
-$('#orden').addEventListener('change', () => {
-  state.page = 1
-  state.orden = $('#orden').value
-  stateToParams()
-  search()
-})
-
-// Expose to window for inline scripts
-window.state = state
-window.search = search
-window.stateToParams = stateToParams
-
-paramsToState()
-stateToParams()
-search()
+}
