@@ -4,96 +4,157 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Detalle del Recurso</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <title>Detalle del Recurso | Repositorio IA y Educación</title>
+  <meta name="description" content="Ficha completa del recurso educativo sobre Inteligencia Artificial">
   <link rel="stylesheet" href="./css/styles.css">
-  <style>
-    .kv dt {
-      color: #374151;
-      font-weight: 600
-    }
-
-    .kv dd {
-      color: #111827
-    }
-  </style>
 </head>
 
-<body class="min-h-screen bg-gray-50 text-gray-900">
-  <header class="bg-white border-b">
-    <div class="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
-      <a href="index.html" class="text-xl font-semibold text-indigo-600">Repositorio Digital</a>
-      <button id="btn-logout" class="hidden text-sm font-medium text-red-600 hover:text-red-800">Cerrar sesión</button>
+<body>
+  <!-- Header -->
+  <header class="site-header">
+    <div class="container" style="display:flex; align-items:center; justify-content:space-between;">
+      <a href="./index.html" class="logo">
+        <div class="logo-icon">R</div>
+        <span>IA y Educación</span>
+      </a>
+      <nav style="display:flex; gap:1rem; align-items:center;">
+        <a href="./index.html" class="nav-link">← Volver al Catálogo</a>
+        <button id="btn-logout" class="nav-link hidden"
+          style="background:none; border:none; cursor:pointer; color:#fca5a5;">
+          Cerrar sesión
+        </button>
+      </nav>
     </div>
   </header>
 
-  <main class="max-w-5xl mx-auto px-4 py-8">
-    <div class="flex items-center justify-between mb-4">
-      <div class="text-sm text-gray-500" id="breadcrumb">
-        <a href="index.html" class="hover:underline">Inicio</a> / <span id="breadcrumb-title">...</span>
-      </div>
+  <!-- Main Content -->
+  <main class="detail-page">
+    <div class="container detail-container">
+
+      <!-- Breadcrumb -->
+      <nav class="breadcrumb">
+        <a href="./index.html">Inicio</a>
+        <span class="breadcrumb-sep">›</span>
+        <span class="breadcrumb-current" id="breadcrumb-title">Cargando...</span>
+      </nav>
+
+      <!-- Detail Card -->
+      <article class="detail-card">
+
+        <!-- Header with Title -->
+        <div class="detail-header">
+          <h1 id="titulo" class="detail-title">Cargando título...</h1>
+          <div class="detail-subtitle">
+            <span id="detail-type-badge" class="detail-type-badge"></span>
+            <span id="anio">—</span>
+            <span id="coleccion">—</span>
+          </div>
+        </div>
+
+        <!-- Body -->
+        <div class="detail-body">
+
+          <!-- Abstract -->
+          <div class="abstract-section" id="abstract-section" style="display:none;">
+            <h3>Resumen / Descripción</h3>
+            <p id="resumen"></p>
+          </div>
+
+          <!-- Metadata Table -->
+          <table class="metadata-table">
+            <tbody>
+              <tr id="row-autores">
+                <th>Autoría</th>
+                <td>
+                  <ul id="autores" class="authors-list"></ul>
+                </td>
+              </tr>
+              <tr id="row-institucion">
+                <th>Institución Fuente</th>
+                <td id="institucion_fuente">—</td>
+              </tr>
+              <tr id="row-tipo">
+                <th>Tipo de Recurso</th>
+                <td id="tipo">—</td>
+              </tr>
+              <tr id="row-anio-pub">
+                <th>Año de Publicación</th>
+                <td id="anio_publicacion">—</td>
+              </tr>
+              <tr id="row-idioma">
+                <th>Idioma</th>
+                <td id="idioma">—</td>
+              </tr>
+              <tr id="row-pais">
+                <th>País de Origen</th>
+                <td id="pais_origen">—</td>
+              </tr>
+              <tr id="row-doi">
+                <th>DOI / ISBN</th>
+                <td id="codigo_documento">—</td>
+              </tr>
+              <tr id="row-formato">
+                <th>Formato</th>
+                <td id="formato">—</td>
+              </tr>
+              <tr id="row-acceso">
+                <th>Tipo de Acceso</th>
+                <td id="tipo_acceso">—</td>
+              </tr>
+              <tr id="row-fecha-ingreso">
+                <th>Fecha de Ingreso</th>
+                <td id="fecha_ingreso">—</td>
+              </tr>
+              <tr id="row-etiquetas">
+                <th>Palabras Clave</th>
+                <td>
+                  <div id="etiquetas" class="detail-tags"></div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <!-- License -->
+          <div class="license-badge" id="license-section">
+            <img id="licencia_badge" alt="Licencia" src="">
+            <span id="licencia_texto">Licencia no especificada</span>
+          </div>
+
+          <!-- Actions -->
+          <div class="detail-actions">
+            <a id="btn_acceso" href="#" target="_blank" rel="noopener" class="btn btn-primary">
+              🔗 Acceder al Recurso
+            </a>
+            <a href="./index.html" class="btn btn-secondary">
+              ← Volver al Catálogo
+            </a>
+          </div>
+
+          <!-- Admin Section (hidden by default) -->
+          <div id="edit-container" class="admin-section hidden">
+            <h4>Opciones de Administrador</h4>
+            <div style="display:flex; gap:0.75rem; flex-wrap:wrap;">
+              <a id="btn-editar" href="#" class="btn btn-secondary">✏️ Editar Recurso</a>
+              <button id="btn-eliminar" class="btn btn-danger">🗑️ Eliminar</button>
+            </div>
+          </div>
+
+        </div>
+      </article>
+
     </div>
-
-    <article class="bg-white border rounded-lg p-6">
-      <h1 id="titulo" class="text-2xl font-semibold mb-2"></h1>
-      <div class="flex flex-wrap items-center gap-2 text-sm text-gray-600 mb-4">
-        <span id="anio"></span>
-        <span>·</span>
-        <span id="tipo"></span>
-        <span>·</span>
-        <span id="coleccion"></span>
-      </div>
-
-      <div class="mb-6">
-        <h2 class="text-base font-semibold mb-1">Autores</h2>
-        <ul id="autores" class="list-disc pl-5 text-gray-800"></ul>
-      </div>
-
-      <div class="mb-6">
-        <h2 class="text-base font-semibold mb-1">Resumen</h2>
-        <p id="resumen" class="text-gray-800 whitespace-pre-line"></p>
-      </div>
-
-      <div class="mb-6">
-        <h2 class="text-base font-semibold mb-1">Etiquetas</h2>
-        <div id="etiquetas" class="flex flex-wrap gap-2"></div>
-      </div>
-
-      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mt-6">
-        <div class="flex items-center gap-3">
-          <img id="licencia_badge" alt="Licencia CC" class="h-8">
-          <span id="licencia_texto" class="text-sm text-gray-700"></span>
-        </div>
-        <a id="btn_acceso" href="#" target="_blank" rel="noopener"
-          class="inline-flex items-center justify-center px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md"></a>
-      </div>
-
-      <!-- Admin only: Edit button -->
-      <div id="edit-container" class="hidden mt-6">
-        <a id="btn-editar" href="#"
-          class="inline-flex items-center justify-center px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md">Editar</a>
-        <button id="btn-eliminar"
-          class="ml-2 inline-flex items-center justify-center px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-md">Eliminar</button>
-      </div>
-
-      <dl class="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm kv">
-        <div>
-          <dt>Código de documento</dt>
-          <dd id="codigo_documento"></dd>
-        </div>
-        <div>
-          <dt>Fecha de ingreso</dt>
-          <dd id="fecha_ingreso"></dd>
-        </div>
-      </dl>
-    </article>
   </main>
 
-  <footer class="bg-white border-t">
-    <div class="max-w-5xl mx-auto px-4 py-6 text-sm flex items-center justify-between">
-      <p class="text-gray-600">Contenido bajo licencias Creative Commons</p>
-      <a class="text-indigo-600 hover:underline" href="https://creativecommons.org/about/downloads/" target="_blank"
-        rel="noopener">Acerca de CC</a>
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="container footer-container">
+      <div>
+        <strong>Repositorio Digital de Acceso Abierto</strong> • IA y Educación
+      </div>
+      <div>
+        <a href="#">Privacidad</a> • <a href="#">Términos</a> •
+        <a href="https://creativecommons.org/about/" target="_blank" rel="noopener">Licencias CC</a>
+      </div>
     </div>
   </footer>
 
