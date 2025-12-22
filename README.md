@@ -287,29 +287,48 @@ vercel env add SUPABASE_DB_PASSWORD
 - ✅ **Sanitización de texto** para prevenir XSS
 - ✅ **Rate limiting** para prevenir abuso
 
+## 🤖 AI Stack
+
+Este proyecto fue desarrollado con asistencia de herramientas de IA:
+
+| Herramienta | Uso |
+|-------------|-----|
+| **Google Antigravity** | Agente de desarrollo integrado en VS Code |
+| **Claude Opus Thinking 4.5** | Modelo de lenguaje para generación de código y documentación |
+
+### ⚠️ Advertencias Importantes
+
+> **🚨 ESTE PROYECTO NO ES APTO PARA PRODUCCIÓN**
+
+Este repositorio es un **proyecto educativo y de demostración** que:
+
+- ❌ **NO ha sido auditado** para seguridad en producción
+- ❌ **Puede contener vulnerabilidades** no detectadas
+- ❌ **NO garantiza** disponibilidad, integridad o confidencialidad de datos
+- ❌ **NO debe usarse** para almacenar información sensible
+
+### ✅ Usos Apropiados
+
+- 📚 **Uso pedagógico**: Aprender arquitectura de software, patrones de diseño
+- 🧪 **MVP / Prototipado**: Validar ideas rápidamente
+- 💻 **Desarrollo local**: Experimentación y pruebas
+- 📖 **Referencia**: Estudiar implementación de Flask, Supabase, Vercel
+
 ## 📄 Licencia
 
-Este proyecto y su código fuente están bajo licencia [MIT](LICENSE).
+Este proyecto está bajo licencia **Creative Commons Attribution 4.0 International (CC BY 4.0)**.
 
-Los documentos del repositorio están bajo licencias Creative Commons según lo especificado en cada recurso.
+[![CC BY 4.0](https://licensebuttons.net/l/by/4.0/88x31.png)](https://creativecommons.org/licenses/by/4.0/)
 
-## 👥 Contribución
+Esto significa que puedes:
+- ✅ **Copiar y redistribuir** el material en cualquier medio o formato
+- ✅ **Adaptar** — remezclar, transformar y construir a partir del material
+- ✅ **Uso comercial** permitido
 
-Las contribuciones son bienvenidas.Por favor:
+Bajo las siguientes condiciones:
+- 📌 **Atribución** — Debes dar crédito apropiado, proporcionar un enlace a la licencia e indicar si se realizaron cambios
 
-1. Fork el repositorio
-2. Crea una branch para tu feature (`git checkout -b feature/nueva-funcionalidad`)
-3. Sigue los patrones arquitectónicos establecidos
-4. Agrega tests
-5. Documenta tu código con comentarios educativos
-6. Envía un Pull Request
-
-## 📞 Contacto
-
-Para preguntas sobre la arquitectura o decisiones de diseño:
-- Revisar comentarios en el código (todos los archivos tienen documentación detallada)
-- Consultar la documentación de patrones
-- Abrir un issue en GitHub
+Ver archivo [LICENSE](LICENSE) para el texto completo.
 
 ---
 
