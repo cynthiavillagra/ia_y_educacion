@@ -227,16 +227,20 @@ async function search() {
     const res = await fetch(`/api/search?${params.toString()}`)
 
     if (!res.ok) {
-      // Intento leer error detallado
       let errorMsg = `Error ${res.status}`
       try {
-        const errJson = await res.json()
-        if (errJson.error) errorMsg = errJson.error
-        else if (errJson.detail) errorMsg = errJson.detail
-      } catch (e) {
-        // Si no es JSON, texto plano?
-        const text = await res.text()
-        if (text) errorMsg = text.slice(0, 500)
+        // Clonamos para poder leer dos veces si falla la primera
+        const resClone = res.clone()
+        try {
+          const errJson = await res.json()
+          if (errJson.error) errorMsg = errJson.error
+          else if (errJson.detail) errorMsg = errJson.detail
+        } catch (e) {
+          const text = await resClone.text()
+          if (text) errorMsg = text.slice(0, 500)
+        }
+      } catch (rootErr) {
+        console.warn('Error parsing error response:', rootErr)
       }
       throw new Error(errorMsg)
     }
