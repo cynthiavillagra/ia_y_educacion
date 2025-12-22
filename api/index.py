@@ -240,4 +240,173 @@ def get_config():
 def health():
     return jsonify({"status": "ok"})
 
+# -----------------------------------------------------------------------------
+# ADMIN: CREATE (Ingestion)
+# -----------------------------------------------------------------------------
+@app.route('/api/admin/ingestion', methods=['POST'])
+def create_resource():
+    """Crear nuevo recurso."""
+    try:
+        # TODO: Verificar token JWT aquí si es necesario
+        # auth_header = request.headers.get('Authorization')
+        
+        # Obtener datos del formulario
+        data = request.form.to_dict() if request.form else request.get_json() or {}
+        
+        # Generar ID único
+        import uuid
+        from datetime import date
+        resource_id = f"SAIA-{uuid.uuid4().hex[:8].upper()}"
+        
+        conn = get_connection()
+        try:
+            with conn.cursor() as cur:
+                cur.execute("""
+                    INSERT INTO recursos (
+                        id, titulo, titulo_original, tipo_recurso, descripcion_resumen,
+                        autores, institucion_autora, institucion_fuente,
+                        anio_publicacion, pais_origen, idioma, doi, isbn_issn,
+                        url_fuente_original, archivo_local, tipo_acceso, licencia, formato,
+                        palabras_clave, fecha_incorporacion_repo
+                    ) VALUES (
+                        %s, %s, %s, %s, %s,
+                        %s, %s, %s,
+                        %s, %s, %s, %s, %s,
+                        %s, %s, %s, %s, %s,
+                        %s, %s
+                    )
+                    RETURNING id
+                """, (
+                    resource_id,
+                    data.get('titulo'),
+                    data.get('titulo_original'),
+                    data.get('tipo_recurso', 'paper_academico'),
+                    data.get('descripcion_resumen'),
+                    data.get('autores'),
+                    data.get('institucion_autora'),
+                    data.get('institucion_fuente'),
+                    int(data.get('anio_publicacion')) if data.get('anio_publicacion') else None,
+                    data.get('pais_origen'),
+                    data.get('idioma'),
+                    data.get('doi'),
+                    data.get('isbn_issn'),
+                    data.get('url_fuente_original'),
+                    data.get('archivo_local', 'false') == 'true',
+                    data.get('tipo_acceso', 'abierto'),
+                    data.get('licencia'),
+                    data.get('formato'),
+                    data.get('palabras_clave'),
+                    date.today()
+                ))
+                conn.commit()
+                new_id = cur.fetchone()[0]
+        finally:
+            conn.close()
+        
+        return jsonify({"id": new_id, "success": True})
+        
+    except Exception as e:
+        print(f"ERROR in create_resource: {traceback.format_exc()}")
+        return jsonify({"error": str(e)}), 500
+
+# -----------------------------------------------------------------------------
+# ADMIN: UPDATE
+# -----------------------------------------------------------------------------
+@app.route('/api/admin/update', methods=['PUT', 'POST'])
+def update_resource():
+    """Actualizar recurso existente."""
+    try:
+        data = request.get_json() or {}
+        resource_id = data.get('id')
+        
+        if not resource_id:
+            return jsonify({"error": "ID requerido"}), 400
+        
+        conn = get_connection()
+        try:
+            with conn.cursor() as cur:
+                cur.execute("""
+                    UPDATE recursos SET
+                        titulo = %s,
+                        titulo_original = %s,
+                        tipo_recurso = %s,
+                        descripcion_resumen = %s,
+                        autores = %s,
+                        institucion_autora = %s,
+                        institucion_fuente = %s,
+                        anio_publicacion = %s,
+                        pais_origen = %s,
+                        idioma = %s,
+                        doi = %s,
+                        isbn_issn = %s,
+                        url_fuente_original = %s,
+                        tipo_acceso = %s,
+                        licencia = %s,
+                        formato = %s,
+                        palabras_clave = %s
+                    WHERE id = %s
+                """, (
+                    data.get('titulo'),
+                    data.get('titulo_original'),
+                    data.get('tipo_recurso'),
+                    data.get('descripcion_resumen'),
+                    data.get('autores'),
+                    data.get('institucion_autora'),
+                    data.get('institucion_fuente'),
+                    int(data.get('anio_publicacion')) if data.get('anio_publicacion') else None,
+                    data.get('pais_origen'),
+                    data.get('idioma'),
+                    data.get('doi'),
+                    data.get('isbn_issn'),
+                    data.get('url_fuente_original'),
+                    data.get('tipo_acceso'),
+                    data.get('licencia'),
+                    data.get('formato'),
+                    data.get('palabras_clave'),
+                    resource_id
+                ))
+                conn.commit()
+                updated = cur.rowcount > 0
+        finally:
+            conn.close()
+        
+        if updated:
+            return jsonify({"success": True, "id": resource_id})
+        else:
+            return jsonify({"error": "Recurso no encontrado"}), 404
+        
+    except Exception as e:
+        print(f"ERROR in update_resource: {traceback.format_exc()}")
+        return jsonify({"error": str(e)}), 500
+
+# -----------------------------------------------------------------------------
+# ADMIN: DELETE
+# -----------------------------------------------------------------------------
+@app.route('/api/admin/delete', methods=['DELETE'])
+def delete_resource():
+    """Eliminar recurso."""
+    try:
+        resource_id = request.args.get('id')
+        
+        if not resource_id:
+            return jsonify({"error": "ID requerido"}), 400
+        
+        conn = get_connection()
+        try:
+            with conn.cursor() as cur:
+                cur.execute("DELETE FROM recursos WHERE id = %s", (resource_id,))
+                conn.commit()
+                deleted = cur.rowcount > 0
+        finally:
+            conn.close()
+        
+        if deleted:
+            return jsonify({"success": True})
+        else:
+            return jsonify({"error": "Recurso no encontrado"}), 404
+        
+    except Exception as e:
+        print(f"ERROR in delete_resource: {traceback.format_exc()}")
+        return jsonify({"error": str(e)}), 500
+
 # Para Vercel: exportamos 'app'

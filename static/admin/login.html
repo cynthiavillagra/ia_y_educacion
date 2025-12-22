@@ -4,63 +4,122 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Login Administración</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <title>Iniciar Sesión | Repositorio IA y Educación</title>
   <link rel="stylesheet" href="../css/styles.css">
 </head>
 
-<body class="min-h-screen bg-gray-50 text-gray-900 font-sans grid place-items-center p-4">
-  <div class="w-full max-w-md bg-white border border-gray-200 rounded-xl shadow-lg p-8">
-    <div class="text-center mb-8">
-      <h1 class="text-2xl font-bold text-indigo-600 tracking-tight">Repositorio Digital</h1>
-      <p class="text-gray-500 mt-2 text-sm">Acceso al panel de administración</p>
+<body>
+  <!-- Header -->
+  <header class="site-header">
+    <div class="container" style="display:flex; align-items:center; justify-content:space-between;">
+      <a href="../index.html" class="logo">
+        <div class="logo-icon">R</div>
+        <span>IA y Educación</span>
+      </a>
+      <nav>
+        <a href="../index.html" class="nav-link">← Volver al Catálogo</a>
+      </nav>
     </div>
+  </header>
 
-    <form id="login-form" class="space-y-6">
-      <div class="space-y-1">
-        <label class="block text-sm font-semibold text-gray-700" for="email">Email</label>
-        <input id="email" name="email" type="email" required
-          class="w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 transition-colors px-4 py-2">
+  <!-- Main Content -->
+  <main style="flex:1; display:flex; align-items:center; justify-content:center; padding:var(--space-8);">
+    <div style="width:100%; max-width:400px;">
+
+      <div class="detail-card">
+        <div class="detail-header" style="text-align:center; padding:var(--space-6);">
+          <h1 style="font-size:1.5rem; color:white; margin:0;">🔐 Área de Administración</h1>
+        </div>
+
+        <div class="detail-body">
+          <p style="text-align:center; color:var(--neutral-600); margin-bottom:var(--space-6);">
+            Ingresa tus credenciales para acceder al panel de gestión de recursos.
+          </p>
+
+          <form id="login-form" style="display:flex; flex-direction:column; gap:var(--space-5);">
+            <div class="form-group">
+              <label class="form-label" for="email">Correo electrónico</label>
+              <input id="email" name="email" type="email" required class="form-input" placeholder="admin@ejemplo.com"
+                autocomplete="email">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="password">Contraseña</label>
+              <input id="password" name="password" type="password" required class="form-input" placeholder="••••••••"
+                autocomplete="current-password">
+            </div>
+
+            <div id="login-error" class="hidden"
+              style="background:#fef2f2; border:1px solid #fecaca; color:#dc2626; padding:var(--space-3); border-radius:var(--border-radius); font-size:0.875rem; text-align:center;">
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="width:100%; justify-content:center;">
+              Iniciar Sesión
+            </button>
+          </form>
+
+          <p style="text-align:center; margin-top:var(--space-6); font-size:0.8rem; color:var(--neutral-500);">
+            ¿Problemas para acceder? Contacta al administrador del sistema.
+          </p>
+        </div>
       </div>
-      <div class="space-y-1">
-        <label class="block text-sm font-semibold text-gray-700" for="password">Contraseña</label>
-        <input id="password" name="password" type="password" required
-          class="w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 transition-colors px-4 py-2">
+
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="container footer-container">
+      <div>
+        <strong>Repositorio Digital</strong> • Panel de Administración
       </div>
+    </div>
+  </footer>
 
-      <button type="submit"
-        class="w-full inline-flex items-center justify-center px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg shadow-sm transition-all focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-        Ingresar
-      </button>
-
-      <div id="login-error"
-        class="p-3 bg-red-50 text-red-700 text-sm rounded-lg hidden border border-red-100 text-center"></div>
-    </form>
-  </div>
-
-  <script src="../js/admin.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-    async function initSupabase() {
+    async function initLogin() {
+      // Cargar config de Supabase
       try {
         const res = await fetch('/api/config')
-        if (!res.ok) throw new Error('Failed to load config')
+        if (!res.ok) throw new Error('Config no disponible')
         const config = await res.json()
-        window.SUPABASE_URL = config.SUPABASE_URL
-        window.SUPABASE_ANON_KEY = config.SUPABASE_ANON_KEY
         window.supabase = window.supabase.createClient(config.SUPABASE_URL, config.SUPABASE_ANON_KEY)
-        return true
       } catch (e) {
-        console.error('Error initializing Supabase:', e)
-        return false
+        console.error('Error init Supabase:', e)
+        document.getElementById('login-error').textContent = 'Error de conexión con el servidor'
+        document.getElementById('login-error').classList.remove('hidden')
+        return
       }
+
+      // Form submit
+      document.getElementById('login-form').addEventListener('submit', async (e) => {
+        e.preventDefault()
+        const email = document.getElementById('email').value
+        const password = document.getElementById('password').value
+        const errorEl = document.getElementById('login-error')
+
+        errorEl.classList.add('hidden')
+
+        try {
+          const { data, error } = await supabase.auth.signInWithPassword({ email, password })
+
+          if (error) {
+            errorEl.textContent = 'Credenciales inválidas'
+            errorEl.classList.remove('hidden')
+            return
+          }
+
+          localStorage.setItem('sb_access_token', data.session?.access_token)
+          location.href = '/admin/ingestion.html'
+        } catch (err) {
+          errorEl.textContent = 'Error de autenticación'
+          errorEl.classList.remove('hidden')
+        }
+      })
     }
 
-    initSupabase().then(ok => {
-      if (ok && window.initAdmin) {
-        window.initAdmin()
-      }
-    })
+    initLogin()
   </script>
 </body>
 
