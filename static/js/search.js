@@ -113,7 +113,32 @@ function cardTemplate(item) {
   `
 }
 
-// ... (search function remains mostly same)
+async function search() {
+  $('#results').innerHTML = ''
+  $('#results-count').textContent = 'Buscando…'
+  const params = new URLSearchParams()
+  const q = $('#q').value.trim(); if (q) params.set('q', q)
+  const autor = $('#autor').value.trim(); if (autor) params.set('autor', autor)
+  const anio = $('#anio').value.trim(); if (anio) params.set('anio', anio)
+  const fuente = $('#fuente').value.trim(); if (fuente) params.set('fuente', fuente)
+  const tipo = $('#tipo').value.trim(); if (tipo) params.set('tipo', tipo)
+  params.set('page', String(state.page))
+  params.set('per_page', String(state.perPage))
+  params.set('orden', state.orden)
+
+  const res = await fetch(`/api/search?${params.toString()}`)
+  if (!res.ok) {
+    $('#results-count').textContent = 'Error al buscar'
+    return
+  }
+  const data = await res.json()
+  // Soporte para estructura { total, items } o lista directa (legacy)
+  const items = Array.isArray(data) ? data : (data.items || data.resultados || [])
+  state.total = typeof data.total === 'number' ? data.total : items.length
+  $('#results-count').textContent = `${state.total} resultados`
+  $('#results').innerHTML = items.map(cardTemplate).join('')
+  renderPagination(state.total, state.page, state.perPage)
+}
 
 // Bind events
 $('#filters-form').addEventListener('submit', (e) => {
