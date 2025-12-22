@@ -4,12 +4,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Repositorio IA y Educación</title>
-
-  <!-- Remove External Fonts to avoid CSP issues/latency -->
-  <!-- Use standard system fonts defined in CSS -->
-
-  <!-- Load Vanilla CSS -->
+  <title>Repositorio IA y Educación | SAIA</title>
+  <meta name="description" content="Repositorio digital de recursos educativos sobre Inteligencia Artificial">
   <link rel="stylesheet" href="./css/styles.css">
 </head>
 
@@ -17,111 +13,123 @@
 
   <!-- Navbar -->
   <header class="site-header">
-    <div class="container justify-between flex">
+    <div class="container" style="display:flex; align-items:center; justify-content:space-between;">
       <a href="./index.html" class="logo">
-        <div class="logo-icon">R</div>
-        <span>IA y Educación</span>
+        <span class="logo-text">SAIA</span>
+        <span class="logo-divider">|</span>
+        <span class="logo-subtitle">Educación</span>
       </a>
-      <nav id="header-nav" class="flex gap-4">
-        <a href="./admin/login.html" class="nav-link">Administración</a>
+      <nav id="header-nav" style="display:flex; gap:1.5rem; align-items:center;">
+        <a href="#recursos" class="nav-link">Recursos</a>
+        <a href="./admin/login.html" class="nav-link nav-link-accent">Iniciar sesión</a>
       </nav>
     </div>
   </header>
 
-  <!-- Hero Section -->
-  <div class="hero">
-    <div class="hero-bg"></div>
-    <div class="hero-content">
-      <h1 class="hero-title">Repositorio de Recursos Educativos</h1>
-      <p class="hero-subtitle">Investigación, documentos y herramientas sobre IA aplicada a la educación.</p>
+  <!-- Hero Section - Estilo SAIA -->
+  <section class="hero-saia">
+    <div class="hero-saia-content">
+      <span class="hero-badge">Repositorio</span>
+      <h1 class="hero-saia-title">
+        RECURSOS PARA LA<br>
+        <span class="hero-highlight">EDUCACIÓN</span>
+      </h1>
+      <p class="hero-saia-subtitle">
+        Documentos, investigaciones y herramientas sobre<br>
+        Inteligencia Artificial aplicada a la educación.
+      </p>
 
-      <form id="hero-search-form" class="search-bar">
-        <span class="search-icon">🔍</span>
-        <input id="q" type="search" class="search-input" placeholder="Buscar por título, autor, palabras clave...">
-        <button type="submit" class="search-btn">Buscar</button>
+      <form id="hero-search-form" class="hero-search-form">
+        <input id="q" type="search" class="hero-search-input" placeholder="Buscar recursos...">
+        <button type="submit" class="hero-search-btn">Buscar</button>
       </form>
     </div>
-  </div>
+  </section>
 
-  <!-- Main Grid -->
-  <main class="container main-grid">
+  <!-- Main Content -->
+  <main id="recursos" class="main-section">
+    <div class="container main-grid">
 
-    <!-- Sidebar Filters -->
-    <aside>
-      <div class="filters-panel">
-        <div class="filters-header">
-          <span class="filters-title">Filtros</span>
-          <button id="clear-filters" class="clear-btn" type="button">Limpiar todo</button>
+      <!-- Sidebar Filters -->
+      <aside class="sidebar">
+        <div class="filters-panel">
+          <div class="filters-header">
+            <span class="filters-title">Filtros</span>
+            <button id="clear-filters" class="clear-btn" type="button">Limpiar</button>
+          </div>
+
+          <form id="filters-form" class="filters-body">
+            <div class="form-group">
+              <label class="form-label" for="fuente">Institución</label>
+              <input id="fuente" name="fuente" type="text" placeholder="UNESCO, UNAM..." class="form-input">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="autor">Autor</label>
+              <input id="autor" name="autor" type="text" placeholder="Apellido..." class="form-input">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="anio">Año</label>
+              <input id="anio" name="anio" type="number" min="1900" max="2100" placeholder="2024" class="form-input">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="tipo">Tipo</label>
+              <select id="tipo" name="tipo" class="form-select">
+                <option value="">Todos</option>
+                <option value="paper_academico">Paper Académico</option>
+                <option value="libro">Libro</option>
+                <option value="capitulo_libro">Capítulo de Libro</option>
+                <option value="informe">Informe</option>
+                <option value="guia">Guía</option>
+                <option value="normativa">Normativa</option>
+                <option value="diseno_curricular">Diseño Curricular</option>
+                <option value="articulo_web">Artículo Web</option>
+                <option value="material_docente">Material Docente</option>
+              </select>
+            </div>
+            <button type="submit" class="apply-btn">Aplicar</button>
+          </form>
         </div>
+      </aside>
 
-        <form id="filters-form" class="filters-body">
-          <div class="form-group">
-            <label class="form-label" for="fuente">Institución Fuente</label>
-            <input id="fuente" name="fuente" type="text" placeholder="Ej: UNAM, MIT..." class="form-input">
-          </div>
-          <div class="form-group">
-            <label class="form-label" for="autor">Autoría</label>
-            <input id="autor" name="autor" type="text" placeholder="Apellido..." class="form-input">
-          </div>
-          <div class="form-group">
-            <label class="form-label" for="anio">Año</label>
-            <input id="anio" name="anio" type="number" min="1900" max="2100" placeholder="Ej: 2024" class="form-input">
-          </div>
-          <div class="form-group">
-            <label class="form-label" for="tipo">Tipo de Recurso</label>
-            <select id="tipo" name="tipo" class="form-select">
-              <option value="">Todos los tipos</option>
-              <option value="paper_academico">Paper Académico</option>
-              <option value="libro">Libro</option>
-              <option value="capitulo_libro">Capítulo de Libro</option>
-              <option value="informe">Informe</option>
-              <option value="guia">Guía</option>
-              <option value="normativa">Normativa</option>
-              <option value="diseno_curricular">Diseño Curricular</option>
-              <option value="articulo_web">Artículo Web</option>
-              <option value="web_institucional">Web Institucional</option>
-              <option value="material_docente">Material Docente</option>
-              <option value="boletin">Boletín</option>
-              <option value="dataset">Dataset</option>
-              <option value="presentacion">Presentación</option>
+      <!-- Results -->
+      <section class="results-section">
+        <div class="toolbar">
+          <p id="results-count" class="results-count">Cargando recursos...</p>
+          <div class="sort-control">
+            <label for="orden">Ordenar:</label>
+            <select id="orden" class="sort-select">
+              <option value="relevancia">Relevancia</option>
+              <option value="recientes">Más recientes</option>
+              <option value="anio_desc">Año ↓</option>
+              <option value="anio_asc">Año ↑</option>
             </select>
           </div>
-          <button type="submit" class="apply-btn">Aplicar Filtros</button>
-        </form>
-      </div>
-    </aside>
-
-    <!-- Results -->
-    <section>
-      <div class="toolbar">
-        <p id="results-count" class="results-count">Cargando...</p>
-        <div class="sort-control">
-          <label for="orden">Ordenar:</label>
-          <select id="orden" class="sort-select">
-            <option value="relevancia">Relevancia</option>
-            <option value="recientes">Recientes</option>
-            <option value="anio_desc">Año (Desc)</option>
-            <option value="anio_asc">Año (Asc)</option>
-          </select>
         </div>
-      </div>
 
-      <div id="results">
-        <!-- JS injected content -->
-      </div>
+        <div id="results">
+          <!-- JS injected content -->
+        </div>
 
-      <div id="pagination"></div>
-    </section>
+        <div id="pagination"></div>
+      </section>
 
+    </div>
   </main>
 
+  <!-- Footer -->
   <footer class="site-footer">
     <div class="container footer-container">
-      <div>
-        <strong>Repositorio Digital de Acceso Abierto</strong> • IA y Educación
+      <div class="footer-brand">
+        <span class="footer-logo">SAIA</span>
+        <span>Sociedad Argentina de Inteligencia Artificial</span>
       </div>
-      <div>
-        <a href="#">Privacidad</a> • <a href="#">Términos</a> • <a href="#">Licencias CC</a>
+      <div class="footer-links">
+        <a href="#">Acerca de</a>
+        <a href="#">Contacto</a>
+        <a href="#">Licencias CC</a>
+      </div>
+      <div class="footer-copy">
+        © 2024 Repositorio de Acceso Abierto
       </div>
     </div>
   </footer>
@@ -133,8 +141,9 @@
       const nav = document.getElementById('header-nav')
       if (token && nav) {
         nav.innerHTML = `
-          <a href="./admin/ingestion.html" class="nav-link" style="color:var(--primary-700)">+ Nuevo Recurso</a>
-          <button id="home-logout" class="nav-link" style="background:none; border:none; cursor:pointer">Salir</button>
+          <a href="#recursos" class="nav-link">Recursos</a>
+          <a href="./admin/ingestion.html" class="nav-link nav-link-accent">+ Nuevo</a>
+          <button id="home-logout" class="nav-link" style="background:none; border:none; cursor:pointer; color:#F24949;">Salir</button>
         `
         const logoutBtn = document.getElementById('home-logout')
         if (logoutBtn) {
@@ -156,13 +165,14 @@
             window.state.page = 1;
             window.stateToParams();
             window.search();
+            // Scroll to results
+            document.getElementById('recursos').scrollIntoView({ behavior: 'smooth' });
           }
         });
       }
     });
   </script>
   <script src="js/sanitizer.js"></script>
-  <!-- Defer loading of search.js to ensure DOM is ready and prevent 'search is not defined' race conditions if called too early -->
   <script src="./js/search.js" defer></script>
 </body>
 

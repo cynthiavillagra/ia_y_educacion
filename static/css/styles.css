@@ -173,34 +173,51 @@ p {
 .logo {
     display: flex;
     align-items: center;
-    gap: var(--space-3);
+    gap: 0.5rem;
     color: white;
-    font-family: var(--font-heading);
-    font-size: 1.25rem;
-    font-weight: 600;
+    font-family: var(--font-body);
+    font-size: 1.1rem;
+    font-weight: 400;
 }
 
 .logo:hover {
-    color: var(--primary-100);
+    color: white;
     text-decoration: none;
 }
 
+.logo-text {
+    font-weight: 700;
+    font-size: 1.5rem;
+    letter-spacing: 0.05em;
+}
+
+.logo-divider {
+    color: var(--accent-purple);
+    font-weight: 300;
+}
+
+.logo-subtitle {
+    color: rgba(255, 255, 255, 0.7);
+    font-weight: 400;
+}
+
+/* Legacy logo icon */
 .logo-icon {
     background: var(--accent-purple);
-    color: var(--primary-900);
-    width: 40px;
-    height: 40px;
+    color: white;
+    width: 36px;
+    height: 36px;
     display: flex;
     align-items: center;
     justify-content: center;
     border-radius: var(--border-radius);
     font-weight: 700;
-    font-size: 1.25rem;
+    font-size: 1rem;
 }
 
 .nav-link {
-    color: var(--primary-200);
-    font-size: 0.875rem;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.9rem;
     font-weight: 500;
     padding: var(--space-2) var(--space-4);
     border-radius: var(--border-radius);
@@ -209,11 +226,135 @@ p {
 
 .nav-link:hover {
     color: white;
-    background: rgba(255, 255, 255, 0.1);
     text-decoration: none;
 }
 
-/* Hero Section */
+.nav-link-accent {
+    background: var(--accent-purple);
+    color: white !important;
+}
+
+.nav-link-accent:hover {
+    background: var(--accent-purple-light);
+}
+
+/* ========================================
+   HERO SECTION - Estilo SAIA
+   ======================================== */
+.hero-saia {
+    background: linear-gradient(180deg, var(--primary-900) 0%, var(--dark-900) 100%);
+    color: white;
+    padding: 6rem 2rem 5rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.hero-saia::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(ellipse at top right, var(--accent-purple) 0%, transparent 50%);
+    opacity: 0.15;
+    pointer-events: none;
+}
+
+.hero-saia-content {
+    position: relative;
+    z-index: 1;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.hero-badge {
+    display: inline-block;
+    background: rgba(177, 80, 242, 0.2);
+    border: 1px solid var(--accent-purple);
+    color: var(--accent-purple-light);
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    padding: 0.5rem 1rem;
+    border-radius: 50px;
+    margin-bottom: 2rem;
+}
+
+.hero-saia-title {
+    font-family: var(--font-body);
+    font-size: 3rem;
+    font-weight: 700;
+    line-height: 1.1;
+    margin-bottom: 1.5rem;
+    color: white;
+    letter-spacing: -0.02em;
+}
+
+.hero-highlight {
+    color: var(--accent-purple-light);
+}
+
+.hero-saia-subtitle {
+    font-size: 1.1rem;
+    color: rgba(255, 255, 255, 0.7);
+    line-height: 1.7;
+    margin-bottom: 2.5rem;
+    font-weight: 400;
+}
+
+/* Hero Search Form */
+.hero-search-form {
+    display: flex;
+    max-width: 500px;
+    margin: 0 auto;
+    gap: 0;
+}
+
+.hero-search-input {
+    flex: 1;
+    padding: 1rem 1.25rem;
+    border: none;
+    border-radius: var(--border-radius) 0 0 var(--border-radius);
+    font-size: 1rem;
+    font-family: var(--font-body);
+    background: white;
+    color: var(--dark-900);
+}
+
+.hero-search-input:focus {
+    outline: none;
+}
+
+.hero-search-input::placeholder {
+    color: var(--neutral-400);
+}
+
+.hero-search-btn {
+    padding: 1rem 2rem;
+    background: var(--accent-purple);
+    color: white;
+    border: none;
+    border-radius: 0 var(--border-radius) var(--border-radius) 0;
+    font-weight: 600;
+    font-family: var(--font-body);
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.hero-search-btn:hover {
+    background: var(--accent-purple-dark);
+}
+
+/* Main Section */
+.main-section {
+    background: var(--neutral-50);
+    padding: var(--space-10) 0;
+}
+
+/* Legacy hero styles (keep for compatibility) */
 .hero {
     background: linear-gradient(135deg, var(--primary-900) 0%, var(--primary-800) 100%);
     color: white;
@@ -241,7 +382,7 @@ p {
     font-weight: 400;
 }
 
-/* Search Bar */
+/* Search Bar (legacy) */
 .search-bar {
     position: relative;
     max-width: 600px;
@@ -261,7 +402,7 @@ p {
 
 .search-input:focus {
     outline: none;
-    border-color: var(--accent-gold);
+    border-color: var(--accent-purple);
 }
 
 .search-icon {
@@ -488,8 +629,8 @@ p {
     font-size: 0.65rem;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    background: var(--accent-gold);
-    color: var(--primary-900);
+    background: var(--accent-purple);
+    color: white;
     padding: var(--space-1) var(--space-2);
     border-radius: 3px;
     white-space: nowrap;
@@ -498,7 +639,7 @@ p {
 
 .article-meta {
     font-size: 0.875rem;
-    color: var(--success);
+    color: var(--accent-purple);
     margin-bottom: var(--space-3);
     font-weight: 500;
 }
@@ -520,6 +661,7 @@ p {
     line-height: 1.7;
     display: -webkit-box;
     -webkit-line-clamp: 3;
+    line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
 }
@@ -583,32 +725,65 @@ p {
 /* Footer */
 .site-footer {
     margin-top: auto;
-    background: var(--primary-900);
-    color: var(--primary-200);
-    padding: var(--space-8) 0;
+    background: var(--dark-900);
+    color: rgba(255, 255, 255, 0.6);
+    padding: 3rem 0 2rem;
 }
 
 .footer-container {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    gap: var(--space-4);
+    gap: 1.5rem;
     text-align: center;
 }
 
-.footer-container a {
-    color: var(--primary-300);
+.footer-brand {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
 }
 
-.footer-container a:hover {
+.footer-logo {
+    font-weight: 700;
+    font-size: 1.5rem;
     color: white;
+    letter-spacing: 0.05em;
+}
+
+.footer-links {
+    display: flex;
+    gap: 1.5rem;
+    justify-content: center;
+}
+
+.footer-links a {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.875rem;
+    transition: color 0.2s ease;
+}
+
+.footer-links a:hover {
+    color: var(--accent-purple-light);
+    text-decoration: none;
+}
+
+.footer-copy {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.3);
 }
 
 @media (min-width: 768px) {
     .footer-container {
         flex-direction: row;
         justify-content: space-between;
+        align-items: center;
         text-align: left;
+    }
+
+    .footer-brand {
+        flex-direction: row;
+        align-items: center;
+        gap: 1rem;
     }
 }
 
